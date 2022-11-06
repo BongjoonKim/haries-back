@@ -1,2 +1,4 @@
-package Controller;public class TEST {
+package Controller;
+
+public class TEST {
 }
