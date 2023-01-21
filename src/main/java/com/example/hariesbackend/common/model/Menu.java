@@ -7,7 +7,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 @Getter
 @Setter
-@Document(collection="menu")
+@Document(collection="Menu")
 public class Menu {
     @Id
     private String id;
