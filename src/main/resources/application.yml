@@ -1,13 +1,20 @@
 # spring.mvc.servlet.load-on-startup=1
 server:
   port: 3001
+#spring:
+#  data:
+#    mongodb:
+#      username: ayeon
+#      uri: mongodb+srv://db-mongodb-haries-app-c430bfeb.mongo.ondigitalocean.com/admin
+#      password: ayeon
+#      authentication-database: admin
+
 spring:
   data:
     mongodb:
+      host: localhost
+      port: 27017
       username: ayeon
-      host: db-mongodb-haries-app-c430bfeb.mongo.ondigitalocean.com
-      uri: mongodb+srv://db-mongodb-haries-app-c430bfeb.mongo.ondigitalocean.com/admin
-      password: ln4g89M5vOtj1327
-      authentication-database: admin
-      database: haries
+      password: ayeon
+      database: admin
 
