@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Builder
 public class Menus {
     @Id
-    private ObjectId _id;
+    private String id;
     private String menuName;
     private String menuHref;
     private String menuLabel;
