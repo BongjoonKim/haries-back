@@ -18,11 +18,4 @@ public class Menus {
     private String menuName;
     private String menuHref;
     private String menuLabel;
-
-//    public Menus(ObjectId _id, String menuName, String menuHref, String menuLabel) {
-//        this._id = _id;
-//        this.menuHref = menuHref;
-//        this.menuLabel = menuLabel;
-//        this.menuName = menuName;
-//    }
 }
