@@ -1,13 +1,12 @@
 package com.hariesbackend.contents.controller;
 
-import com.hariesbackend.common.service.MenuService;
-import com.hariesbackend.contents.model.Documents;
+import com.hariesbackend.contents.dto.DocumentsDTO;
 import com.hariesbackend.contents.service.DocumentsService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/documents")
@@ -16,8 +15,10 @@ public class DocumentsController {
     @Autowired
     private DocumentsService documentsService;
 
+    // 글 쓰기
     @PostMapping("/create")
-    public void createDocuments(Documents data) {
+    public void createDocuments(
+            @RequestBody DocumentsDTO data) {
         try {
             documentsService.createDocuments(data);
         } catch (Exception e) {
@@ -25,4 +26,6 @@ public class DocumentsController {
             throw e;
         }
     }
+
+    // 글 데이터 가져오기
 }

@@ -1,9 +1,7 @@
 package com.hariesbackend.contents.service;
 
-import com.hariesbackend.contents.model.Documents;
-
-import java.util.List;
+import com.hariesbackend.contents.dto.DocumentsDTO;
 
 public interface DocumentsService {
-    void createDocuments(Documents data);
+    void createDocuments(DocumentsDTO data);
 }
