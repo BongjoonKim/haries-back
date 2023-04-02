@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Data
@@ -12,6 +13,12 @@ import java.util.Objects;
 @NoArgsConstructor
 @Builder
 public class DocumentsDTO {
+
+    public DocumentsDTO() {
+
+    }
     private String titles;
     private String htmlContents;
+    private LocalDateTime created;
+    private String initialUser;
 }

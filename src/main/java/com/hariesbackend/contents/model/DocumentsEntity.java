@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -17,4 +20,8 @@ public class DocumentsEntity {
     private String htmlContents;
     private boolean disclose;
     private String[] tags;
+    private LocalDateTime created;
+    private LocalDateTime modified;
+    private String initialUser;
+    private String modifiedUser;
 }
