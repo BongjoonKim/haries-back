@@ -13,10 +13,6 @@ import java.util.Objects;
 @NoArgsConstructor
 @Builder
 public class DocumentsDTO {
-
-    public DocumentsDTO() {
-
-    }
     private String titles;
     private String htmlContents;
     private LocalDateTime created;
