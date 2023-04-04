@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/documents")
+@RequestMapping("example/documents")
 @Slf4j
 public class DocumentsController {
     @Autowired
