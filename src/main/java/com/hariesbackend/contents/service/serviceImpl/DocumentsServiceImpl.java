@@ -49,7 +49,7 @@ public class DocumentsServiceImpl implements DocumentsService {
     public List<DocumentsDTO> getAllDocuments(PaginationDTO paginationDTO) {
 
         List<DocumentsEntity> entityList = documentsRepository.findAll();
-        Page<DocumentsEntity> entityPage = documentsRepository.findAll(PageRequest.of(paginationDTO.getPage() ,paginationDTO.getSize(), paginationDTO.getSort()));
+        Page<DocumentsEntity> entityPage = documentsRepository.findAll(PageRequest.of(paginationDTO.getPage() ,paginationDTO.getSize()));
         log.info("정보", entityPage.getContent());
 
 

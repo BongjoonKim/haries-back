@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -36,11 +37,10 @@ public class DocumentsController {
     @GetMapping("/get-all")
     public List<DocumentsDTO> getAllDocuments(
             @RequestParam("page") int page,
-            @RequestParam("size") int size,
-            @RequestParam("sort") Sort sort
-            ) {
+            @RequestParam("size") int size
+    ) {
         try {
-            return documentsService.getAllDocuments(new PaginationDTO(page, size, sort));
+            return documentsService.getAllDocuments(new PaginationDTO(page, size));
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
