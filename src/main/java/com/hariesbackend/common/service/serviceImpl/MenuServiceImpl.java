@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -20,7 +21,7 @@ public class MenuServiceImpl implements MenuService {
 
     @Override
     public List<Menus> getAllMenuList() {
-        return menuRepository.findAll();
+        return menuRepository.findAll().stream().sorted(Comparator.comparing(Menus::getSequence)).toList();
     }
 
 

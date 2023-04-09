@@ -18,4 +18,5 @@ public class Menus {
     private String menuName;
     private String menuHref;
     private String menuLabel;
+    private int sequence;
 }
