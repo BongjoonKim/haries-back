@@ -1,6 +1,6 @@
 package com.hariesbackend.contents.controller;
 
-import com.hariesbackend.contents.dto.DocumentsDTO;
+import com.hariesbackend.contents.dto.DocumentInfo;
 import com.hariesbackend.contents.dto.PaginationDTO;
 import com.hariesbackend.contents.service.DocumentsService;
 import lombok.Getter;
@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("example/documents")
+@RequestMapping("documents")
 @Slf4j
 public class DocumentsController {
     @Autowired
@@ -23,7 +23,7 @@ public class DocumentsController {
     // 글 쓰기
     @PostMapping("/create")
     public void createDocuments(
-            @RequestBody DocumentsDTO data
+            @RequestBody DocumentInfo.DocumentsDTO data
     ) {
         try {
             documentsService.createDocuments(data);
@@ -35,7 +35,7 @@ public class DocumentsController {
 
     // 글 데이터 가져오기
     @GetMapping("/get-all")
-    public List<DocumentsDTO> getAllDocuments(
+    public DocumentInfo getAllDocuments(
             @RequestParam("page") int page,
             @RequestParam("size") int size
     ) {

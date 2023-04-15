@@ -1,6 +1,6 @@
 package com.hariesbackend.contents.service.serviceImpl;
 
-import com.hariesbackend.contents.dto.DocumentsDTO;
+import com.hariesbackend.contents.dto.DocumentInfo;
 import com.hariesbackend.contents.dto.PaginationDTO;
 import com.hariesbackend.contents.model.DocumentsEntity;
 import com.hariesbackend.contents.repository.DocumentsRepository;
@@ -32,7 +32,7 @@ public class DocumentsServiceImpl implements DocumentsService {
 
     // 글 데이터 생성
     @Override
-    public void createDocuments(DocumentsDTO data) {
+    public void createDocuments(DocumentInfo.DocumentsDTO data) {
         // 현재 시스템 시간
         LocalDateTime now = LocalDateTime.now();
 
@@ -46,24 +46,29 @@ public class DocumentsServiceImpl implements DocumentsService {
 
     // 모든 글 데이터 조회
     @Override
-    public List<DocumentsDTO> getAllDocuments(PaginationDTO paginationDTO) {
+    public DocumentInfo getAllDocuments(PaginationDTO paginationDTO) {
 
-        List<DocumentsEntity> entityList = documentsRepository.findAll();
         Page<DocumentsEntity> entityPage = documentsRepository.findAll(PageRequest.of(paginationDTO.getPage() ,paginationDTO.getSize()));
-        log.info("정보", entityPage.getContent());
 
 
-        List<DocumentsDTO> documentsDTOList = entityPage.getContent().stream().map(entity -> new DocumentsDTO(
+        List<DocumentInfo.DocumentsDTO> documentsDTOList = entityPage.getContent().stream().map(entity -> new DocumentInfo.DocumentsDTO(
+            entity.getId(),
             entity.getTitle(),
             entity.getHtmlContents(),
             entity.getCreated(),
             entity.getInitialUser()
         )).collect(Collectors.toList());
 
+
+        DocumentInfo documentInfo = new DocumentInfo();
+        documentInfo.setDocumentsDTO(documentsDTOList);
+        documentInfo.setTotalPages(entityPage.getTotalPages());
+        documentInfo.setTotalContents(entityPage.getTotalElements());
+
         // 날짜, 시간 formatting
 //        String formatedNow = now.format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH시 mm분 ss초"));
 
-        return documentsDTOList;
+        return documentInfo;
     }
 
 
