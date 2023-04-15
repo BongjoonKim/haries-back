@@ -1,6 +1,6 @@
 package com.hariesbackend.contents.service.serviceImpl;
 
-import com.hariesbackend.contents.dto.DocumentInfo;
+import com.hariesbackend.contents.dto.DocumentsInfo;
 import com.hariesbackend.contents.dto.PaginationDTO;
 import com.hariesbackend.contents.model.DocumentsEntity;
 import com.hariesbackend.contents.repository.DocumentsRepository;
@@ -32,7 +32,7 @@ public class DocumentsServiceImpl implements DocumentsService {
 
     // 글 데이터 생성
     @Override
-    public void createDocuments(DocumentInfo.DocumentsDTO data) {
+    public void createDocuments(DocumentsInfo.DocumentDTO data) {
         // 현재 시스템 시간
         LocalDateTime now = LocalDateTime.now();
 
@@ -46,12 +46,12 @@ public class DocumentsServiceImpl implements DocumentsService {
 
     // 모든 글 데이터 조회
     @Override
-    public DocumentInfo getAllDocuments(PaginationDTO paginationDTO) {
+    public DocumentsInfo getAllDocuments(PaginationDTO paginationDTO) {
 
         Page<DocumentsEntity> entityPage = documentsRepository.findAll(PageRequest.of(paginationDTO.getPage() ,paginationDTO.getSize()));
 
 
-        List<DocumentInfo.DocumentsDTO> documentsDTOList = entityPage.getContent().stream().map(entity -> new DocumentInfo.DocumentsDTO(
+        List<DocumentsInfo.DocumentDTO> documentsDTOList = entityPage.getContent().stream().map(entity -> new DocumentsInfo.DocumentDTO(
             entity.getId(),
             entity.getTitle(),
             entity.getHtmlContents(),
@@ -60,7 +60,7 @@ public class DocumentsServiceImpl implements DocumentsService {
         )).collect(Collectors.toList());
 
 
-        DocumentInfo documentInfo = new DocumentInfo();
+        DocumentsInfo documentInfo = new DocumentsInfo();
         documentInfo.setDocumentsDTO(documentsDTOList);
         documentInfo.setTotalPages(entityPage.getTotalPages());
         documentInfo.setTotalContents(entityPage.getTotalElements());
@@ -69,6 +69,16 @@ public class DocumentsServiceImpl implements DocumentsService {
 //        String formatedNow = now.format(DateTimeFormatter.ofPattern("yyyy년 MM월 dd일 HH시 mm분 ss초"));
 
         return documentInfo;
+    }
+
+    @Override
+    public DocumentsInfo.DocumentDTO getDocument(String id) {
+        DocumentsEntity entity = documentsRepository.findById(id).get();
+        DocumentsInfo.DocumentDTO document = new DocumentsInfo.DocumentDTO();
+        document.setId(entity.getId());
+        document.setTitles(entity.getTitle());
+        document.setHtmlContents(entity.getHtmlContents());
+        return document;
     }
 
 

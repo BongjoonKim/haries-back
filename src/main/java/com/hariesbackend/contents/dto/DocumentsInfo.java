@@ -8,16 +8,16 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class DocumentInfo {
+public class DocumentsInfo {
     private long totalContents;
     private int totalPages;
-    private List<DocumentsDTO> documentsDTO;
+    private List<DocumentDTO> documentsDTO;
 
     @Getter
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor
-    public static class DocumentsDTO {
+    public static class DocumentDTO {
         private String id;
         private String titles;
         private String htmlContents;
