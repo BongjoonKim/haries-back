@@ -20,7 +20,8 @@ public class DocumentsInfo {
     public static class DocumentDTO {
         private String id;
         private String titles;
-        private String htmlContents;
+        private String contents;
+        private String contentsType;
         private LocalDateTime created;
         private String initialUser;
     }

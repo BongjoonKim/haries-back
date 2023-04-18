@@ -36,10 +36,10 @@ public class DocumentsServiceImpl implements DocumentsService {
         // 현재 시스템 시간
         LocalDateTime now = LocalDateTime.now();
 
-        System.out.println("여기보세용");
         DocumentsEntity entity = new DocumentsEntity();
         entity.setTitle(data.getTitles());
-        entity.setHtmlContents(data.getHtmlContents());
+        entity.setContents(data.getContents());
+        entity.setContentsType(data.getContentsType());
         entity.setCreated(now);
         documentsRepository.save(entity);
     }
@@ -54,7 +54,8 @@ public class DocumentsServiceImpl implements DocumentsService {
         List<DocumentsInfo.DocumentDTO> documentsDTOList = entityPage.getContent().stream().map(entity -> new DocumentsInfo.DocumentDTO(
             entity.getId(),
             entity.getTitle(),
-            entity.getHtmlContents(),
+            entity.getContents(),
+            entity.getContentsType(),
             entity.getCreated(),
             entity.getInitialUser()
         )).collect(Collectors.toList());
@@ -77,7 +78,7 @@ public class DocumentsServiceImpl implements DocumentsService {
         DocumentsInfo.DocumentDTO document = new DocumentsInfo.DocumentDTO();
         document.setId(entity.getId());
         document.setTitles(entity.getTitle());
-        document.setHtmlContents(entity.getHtmlContents());
+        document.setContents(entity.getContents());
         return document;
     }
 

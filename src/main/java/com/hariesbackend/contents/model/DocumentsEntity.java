@@ -17,7 +17,8 @@ public class DocumentsEntity {
     @Id
     private String id;
     private String title;
-    private String htmlContents;
+    private String contents;
+    private String contentsType;
     private boolean disclose;
     private String[] tags;
     private LocalDateTime created;
