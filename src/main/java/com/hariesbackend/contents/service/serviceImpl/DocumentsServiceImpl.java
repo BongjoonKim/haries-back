@@ -41,6 +41,9 @@ public class DocumentsServiceImpl implements DocumentsService {
         entity.setContents(data.getContents());
         entity.setContentsType(data.getContentsType());
         entity.setCreated(now);
+        entity.setModified(now);
+        entity.setInitialUser("haries");
+        entity.setModifiedUser("haries");
         documentsRepository.save(entity);
     }
 
@@ -57,7 +60,9 @@ public class DocumentsServiceImpl implements DocumentsService {
             entity.getContents(),
             entity.getContentsType(),
             entity.getCreated(),
-            entity.getInitialUser()
+            entity.getInitialUser(),
+            entity.getModified(),
+            entity.getModifiedUser()
         )).collect(Collectors.toList());
 
 
@@ -79,8 +84,15 @@ public class DocumentsServiceImpl implements DocumentsService {
         document.setId(entity.getId());
         document.setTitles(entity.getTitle());
         document.setContents(entity.getContents());
+        document.setCreated(entity.getCreated());
+        document.setModified(entity.getModified());
+        document.setModifiedUser(entity.getModifiedUser());
         return document;
     }
 
-
+    // 글 삭제
+    @Override
+    public void deleteDocument(String id) {
+        documentsRepository.deleteById(id);
+    }
 }

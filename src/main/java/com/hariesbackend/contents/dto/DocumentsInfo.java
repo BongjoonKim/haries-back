@@ -24,6 +24,8 @@ public class DocumentsInfo {
         private String contentsType;
         private LocalDateTime created;
         private String initialUser;
+        private LocalDateTime modified;
+        private String modifiedUser;
     }
 
 

@@ -15,4 +15,6 @@ public interface DocumentsService {
 
     DocumentsInfo.DocumentDTO getDocument(String id);
 
+    void deleteDocument(String id);
+
 }

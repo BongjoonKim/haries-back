@@ -57,4 +57,14 @@ public class DocumentsController {
             throw e;
         }
     }
+
+    @DeleteMapping("/get")
+    public void deleteDocument(@RequestParam("id") String id) {
+        try {
+            documentsService.deleteDocument(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
 }
