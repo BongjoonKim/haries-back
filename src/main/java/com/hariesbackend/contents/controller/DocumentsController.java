@@ -58,7 +58,7 @@ public class DocumentsController {
         }
     }
 
-    @DeleteMapping("/get")
+    @DeleteMapping("/delete")
     public void deleteDocument(@RequestParam("id") String id) {
         try {
             documentsService.deleteDocument(id);
@@ -67,4 +67,18 @@ public class DocumentsController {
             throw e;
         }
     }
+
+    @PutMapping("/save")
+    public void saveDocument(
+            @RequestParam("id") String id,
+            @RequestBody DocumentsInfo.DocumentDTO data
+    ) {
+        try {
+            documentsService.saveDocument(id, data);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
 }

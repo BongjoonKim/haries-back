@@ -95,4 +95,21 @@ public class DocumentsServiceImpl implements DocumentsService {
     public void deleteDocument(String id) {
         documentsRepository.deleteById(id);
     }
+
+    // 글 수정
+    @Override
+    public void saveDocument(String id, DocumentsInfo.DocumentDTO data) {
+        // 현재 시스템 시간
+        LocalDateTime now = LocalDateTime.now();
+
+        DocumentsEntity entity = new DocumentsEntity();
+        entity.setId(id);
+        entity.setTitle(data.getTitles());
+        entity.setContents(data.getContents());
+        entity.setContentsType(data.getContentsType());
+        entity.setModified(now);
+        entity.setModifiedUser("haries");
+
+        documentsRepository.save(entity);
+    }
 }

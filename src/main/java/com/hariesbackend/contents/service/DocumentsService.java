@@ -17,4 +17,6 @@ public interface DocumentsService {
 
     void deleteDocument(String id);
 
+    void saveDocument(String id, DocumentsInfo.DocumentDTO data);
+
 }
