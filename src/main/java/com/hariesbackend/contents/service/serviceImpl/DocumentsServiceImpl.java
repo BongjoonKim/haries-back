@@ -84,6 +84,7 @@ public class DocumentsServiceImpl implements DocumentsService {
         document.setId(entity.getId());
         document.setTitles(entity.getTitle());
         document.setContents(entity.getContents());
+        document.setContentsType(entity.getContentsType());
         document.setCreated(entity.getCreated());
         document.setModified(entity.getModified());
         document.setModifiedUser(entity.getModifiedUser());
