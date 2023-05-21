@@ -51,8 +51,7 @@ public class DocumentsServiceImpl implements DocumentsService {
     @Override
     public DocumentsInfo getAllDocuments(PaginationDTO paginationDTO) {
 
-        Page<DocumentsEntity> entityPage = documentsRepository.findAll(PageRequest.of(paginationDTO.getPage() ,paginationDTO.getSize()));
-
+        Page<DocumentsEntity> entityPage = documentsRepository.findAll(PageRequest.of(paginationDTO.getPage() - 1 ,paginationDTO.getSize()));
 
         List<DocumentsInfo.DocumentDTO> documentsDTOList = entityPage.getContent().stream().map(entity -> new DocumentsInfo.DocumentDTO(
             entity.getId(),
@@ -102,9 +101,9 @@ public class DocumentsServiceImpl implements DocumentsService {
     public void saveDocument(String id, DocumentsInfo.DocumentDTO data) {
         // 현재 시스템 시간
         LocalDateTime now = LocalDateTime.now();
+        DocumentsEntity entity = documentsRepository.findById(id).get();
 
-        DocumentsEntity entity = new DocumentsEntity();
-        entity.setId(id);
+//        DocumentsEntity entity = new DocumentsEntity();
         entity.setTitle(data.getTitles());
         entity.setContents(data.getContents());
         entity.setContentsType(data.getContentsType());
