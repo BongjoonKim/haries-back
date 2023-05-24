@@ -26,6 +26,7 @@ public class DocumentsInfo {
         private String initialUser;
         private LocalDateTime modified;
         private String modifiedUser;
+        private String unique;
     }
 
 

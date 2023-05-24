@@ -14,7 +14,9 @@ spring:
     mongodb:
       host: localhost
       port: 27017
-      username: ayeon
-      password: ayeon
+#      username: ayeon
+#      password: ayeon
+      username: haries
+      password: qkdrhd
       database: admin
 

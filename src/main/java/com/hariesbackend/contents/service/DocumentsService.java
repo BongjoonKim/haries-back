@@ -13,7 +13,11 @@ public interface DocumentsService {
     // 모든글 데이터 조회
     DocumentsInfo getAllDocuments(PaginationDTO paginationDTO);
 
+    // 특정 글 조회
     DocumentsInfo.DocumentDTO getDocument(String id);
+
+    // unique로 조회
+    DocumentsInfo.DocumentDTO getDocumentUnique(String unique);
 
     void deleteDocument(String id);
 

@@ -15,11 +15,11 @@
       <jdbc-url>mongodb://localhost:27017/admin</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
-    <data-source source="LOCAL" name="DEV_haries-app" uuid="ff9c4539-82e5-4b77-9780-e8c67994eee1">
+    <data-source source="LOCAL" name="haries-DEV" uuid="84c536ed-3975-4569-8b04-31ec08d2494e">
       <driver-ref>mongo</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>com.dbschema.MongoJdbcDriver</jdbc-driver>
-      <jdbc-url>mongodb://13.124.45.66:27017/admin</jdbc-url>
+      <jdbc-url>mongodb://13.125.233.135:27017/admin</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

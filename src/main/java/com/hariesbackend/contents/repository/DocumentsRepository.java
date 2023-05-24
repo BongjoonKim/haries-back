@@ -6,5 +6,5 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface DocumentsRepository extends MongoRepository<DocumentsEntity, String> {
-
+    public DocumentsEntity findByUnique(String unique);
 }

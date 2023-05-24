@@ -58,6 +58,17 @@ public class DocumentsController {
         }
     }
 
+    // 특정 글 가져오기 (unique Key)
+    @GetMapping("/get/key")
+    public DocumentsInfo.DocumentDTO getDocumentUnique(@RequestParam("unique") String unique) {
+        try {
+            return documentsService.getDocumentUnique(unique);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
     @DeleteMapping("/delete")
     public void deleteDocument(@RequestParam("id") String id) {
         try {

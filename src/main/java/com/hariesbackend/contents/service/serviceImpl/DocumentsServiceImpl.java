@@ -44,6 +44,7 @@ public class DocumentsServiceImpl implements DocumentsService {
         entity.setModified(now);
         entity.setInitialUser("haries");
         entity.setModifiedUser("haries");
+        entity.setUnique(data.getUnique());
         documentsRepository.save(entity);
     }
 
@@ -61,7 +62,8 @@ public class DocumentsServiceImpl implements DocumentsService {
             entity.getCreated(),
             entity.getInitialUser(),
             entity.getModified(),
-            entity.getModifiedUser()
+            entity.getModifiedUser(),
+            entity.getUnique()
         )).collect(Collectors.toList());
 
 
@@ -76,6 +78,7 @@ public class DocumentsServiceImpl implements DocumentsService {
         return documentInfo;
     }
 
+    // 특정 글 조회
     @Override
     public DocumentsInfo.DocumentDTO getDocument(String id) {
         DocumentsEntity entity = documentsRepository.findById(id).get();
@@ -87,6 +90,22 @@ public class DocumentsServiceImpl implements DocumentsService {
         document.setCreated(entity.getCreated());
         document.setModified(entity.getModified());
         document.setModifiedUser(entity.getModifiedUser());
+        document.setUnique(entity.getUnique());
+        return document;
+    }
+
+    @Override
+    public DocumentsInfo.DocumentDTO getDocumentUnique(String unique) {
+        DocumentsEntity entity = documentsRepository.findByUnique(unique);
+        DocumentsInfo.DocumentDTO document = new DocumentsInfo.DocumentDTO();
+        document.setId(entity.getId());
+        document.setTitles(entity.getTitle());
+        document.setContents(entity.getContents());
+        document.setContentsType(entity.getContentsType());
+        document.setCreated(entity.getCreated());
+        document.setModified(entity.getModified());
+        document.setModifiedUser(entity.getModifiedUser());
+        document.setUnique(entity.getUnique());
         return document;
     }
 
@@ -109,6 +128,7 @@ public class DocumentsServiceImpl implements DocumentsService {
         entity.setContentsType(data.getContentsType());
         entity.setModified(now);
         entity.setModifiedUser("haries");
+        entity.setUnique(data.getUnique());
 
         documentsRepository.save(entity);
     }

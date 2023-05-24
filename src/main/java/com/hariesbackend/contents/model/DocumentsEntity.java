@@ -25,4 +25,5 @@ public class DocumentsEntity {
     private LocalDateTime modified;
     private String initialUser;
     private String modifiedUser;
+    private String unique;
 }
