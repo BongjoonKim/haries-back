@@ -23,12 +23,12 @@ public class FoldersEntity {
     private int depth;
     private String path;
     private String parentId;
-    private List<Map<String, String>> childrenId;
+    private List<String> childrenId;
     private String type;
     private boolean show;
     private boolean expand;
     private LocalDateTime created;
     private LocalDateTime modified;
-    private String creater;
+    private String creator;
     private String modifier;
 }

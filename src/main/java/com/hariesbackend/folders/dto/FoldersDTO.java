@@ -15,6 +15,6 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FoldersDTO extends FoldersEntity {
-    private List<FoldersDTO> children;
+    private List<String> children;
 
 }
