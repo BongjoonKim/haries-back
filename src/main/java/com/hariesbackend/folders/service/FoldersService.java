@@ -6,13 +6,15 @@ import com.hariesbackend.folders.model.FoldersEntity;
 import java.util.List;
 
 public interface FoldersService {
-    List<FoldersEntity> getExpandedFolders (String parentId, int depth);
+    List<FoldersDTO> getChildFolders (String parentId);
 
-    FoldersEntity getRootFolder ();
+    FoldersDTO getRootFolder ();
 
     void createFolders(FoldersDTO foldersDTO);
 
-    FoldersEntity getFolder(String id);
+    FoldersDTO getFolder(String id);
+
+    FoldersEntity getFolderByUniqueKey(String uniqueKey);
 
     void modifyFolders(String id, FoldersDTO foldersDTO);
 }

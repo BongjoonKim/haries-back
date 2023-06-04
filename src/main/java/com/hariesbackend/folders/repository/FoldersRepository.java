@@ -10,5 +10,7 @@ import java.util.List;
 public interface FoldersRepository extends MongoRepository<FoldersEntity, String> {
     public List<FoldersEntity> findByDepth(int depth);
 
+    public FoldersEntity findByUniqueKey(String uniqueKey);
+
     public List<FoldersEntity> findByParentIdAndDepth(String parentId, int depth);
 }

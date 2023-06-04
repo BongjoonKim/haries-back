@@ -16,7 +16,7 @@ public class FoldersController {
     @Autowired
     private FoldersService foldersService;
 
-    @PostMapping("/create")
+    @PostMapping("")
     public void createFolder(@RequestBody FoldersDTO foldersDTO) {
         try {
             foldersService.createFolders(foldersDTO);
@@ -27,8 +27,8 @@ public class FoldersController {
     }
 
     // Root 폴더 조회
-    @GetMapping("/get/root")
-    public FoldersEntity getRootFolder() {
+    @GetMapping("/root")
+    public FoldersDTO getRootFolder() {
         try {
             return foldersService.getRootFolder();
         } catch (Exception e) {
@@ -38,8 +38,8 @@ public class FoldersController {
     }
 
     // 특정 폴더 조회
-    @GetMapping("/get")
-    public FoldersEntity getFolder(@RequestParam("id") String id) {
+    @GetMapping("/folder-id")
+    public FoldersDTO getFolders(@RequestParam("id") String id) {
         try {
             return foldersService.getFolder(id);
         } catch (Exception e) {
@@ -48,14 +48,22 @@ public class FoldersController {
         }
     }
 
-    // 해당 폴더 하위 폴더 조회
-    @GetMapping("/get/children")
-    public List<FoldersEntity> getFolderList(
-            @RequestParam("parentId") String parentId,
-            @RequestParam("depth") int depth
-    ) {
+    @GetMapping("/get/unique-key")
+    public FoldersEntity getFolderByUniqueKey(@RequestParam("uniqueKey") String uniqueKey) {
         try {
-            return foldersService.getExpandedFolders(parentId, depth);
+            return foldersService.getFolderByUniqueKey(uniqueKey);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    // 해당 폴더 하위 폴더 조회
+    @GetMapping("/children")
+    public List<FoldersDTO> getChildFolders(
+            @RequestParam("parentId") String parentId) {
+        try {
+            return foldersService.getChildFolders(parentId);
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
