@@ -37,7 +37,7 @@ public class FoldersServiceImpl implements FoldersService {
         System.out.println("parent값 확인"+ folder);
         List<FoldersDTO> foldersDTO = new ArrayList<>();
 
-        List<FoldersEntity> foldersEntityList = foldersRepository.findByParentIdAndDepth(parentId, folder.getDepth());
+        List<FoldersEntity> foldersEntityList = foldersRepository.findByParentIdAndDepth(parentId, folder.getDepth() + 1);
         System.out.println("값 확인"+ foldersEntityList);
         foldersEntityList.stream().forEach(el -> {
             FoldersDTO folderDTO = new FoldersDTO();
@@ -57,8 +57,8 @@ public class FoldersServiceImpl implements FoldersService {
 
         foldersEntity.setUniqueKey(foldersDTO.getUniqueKey());
         foldersEntity.setLabel(foldersDTO.getLabel());
-        foldersEntity.setDepth(foldersDTO.getDepth());
-        foldersEntity.setPath(foldersDTO.getPath());
+//        foldersEntity.setDepth(foldersDTO.getDepth());
+//        foldersEntity.setPath(foldersDTO.getPath());
         foldersEntity.setParentId(foldersDTO.getParentId());
         foldersEntity.setChildrenId(foldersDTO.getChildrenId());
         foldersEntity.setType(foldersDTO.getType());
@@ -73,6 +73,8 @@ public class FoldersServiceImpl implements FoldersService {
         FoldersEntity parentFolder = foldersRepository.findById(foldersDTO.getParentId()).get();
 
         if (parentFolder != null) {
+            foldersEntity.setDepth(parentFolder.getDepth() + 1);
+            foldersEntity.setPath(parentFolder.getPath() + "/" + foldersDTO.getLabel());
             // 자식 추가
             foldersRepository.insert(foldersEntity);
 
@@ -90,9 +92,9 @@ public class FoldersServiceImpl implements FoldersService {
     public FoldersDTO getFolder(String id) {
         FoldersDTO folder = new FoldersDTO();
         FoldersEntity folderE = new FoldersEntity();
-        BeanUtils.copyProperties(foldersRepository.findById(id).get(), folderE);
+        BeanUtils.copyProperties(foldersRepository.findById(id).get(), folder);
         System.out.println("폴더 값 확인"+ foldersRepository.findById(id).get());
-        System.out.println("폴더 값 확인2"+ folderE);
+        System.out.println("폴더 값 확인2"+ folder);
         return folder;
     }
 
