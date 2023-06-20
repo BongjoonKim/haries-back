@@ -27,6 +27,7 @@ public class DocumentsInfo {
         private LocalDateTime modified;
         private String modifiedUser;
         private String unique;
+        private String folderId;
     }
 
 

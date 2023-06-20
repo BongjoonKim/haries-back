@@ -26,4 +26,5 @@ public class DocumentsEntity {
     private String initialUser;
     private String modifiedUser;
     private String unique;
+    private String folderId;
 }
