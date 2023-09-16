@@ -8,6 +8,7 @@ import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
@@ -20,7 +21,7 @@ public class DocumentsEntity {
     private String contents;
     private String contentsType;
     private boolean disclose;
-    private String[] tags;
+    private List<String> tags;
     private LocalDateTime created;
     private LocalDateTime modified;
     private String initialUser;

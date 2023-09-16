@@ -7,6 +7,7 @@ import com.hariesbackend.contents.repository.DocumentsRepository;
 import com.hariesbackend.contents.service.DocumentsService;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -37,14 +38,19 @@ public class DocumentsServiceImpl implements DocumentsService {
         LocalDateTime now = LocalDateTime.now();
 
         DocumentsEntity entity = new DocumentsEntity();
-        entity.setTitle(data.getTitles());
+        entity.setTitle(data.getTitle());
         entity.setContents(data.getContents());
         entity.setContentsType(data.getContentsType());
+        entity.setDisclose(data.isDisclose());
+        entity.setTags(data.getTags());
         entity.setCreated(now);
         entity.setModified(now);
         entity.setInitialUser("haries");
         entity.setModifiedUser("haries");
         entity.setUnique(data.getUnique());
+        entity.setFolderId(data.getFolderId());
+//        BeanUtils.copyProperties(data, entity);
+
         documentsRepository.save(entity);
     }
 
@@ -59,11 +65,14 @@ public class DocumentsServiceImpl implements DocumentsService {
             entity.getTitle(),
             entity.getContents(),
             entity.getContentsType(),
+            entity.isDisclose(),
+            entity.getTags(),
             entity.getCreated(),
-            entity.getInitialUser(),
             entity.getModified(),
+            entity.getInitialUser(),
             entity.getModifiedUser(),
-            entity.getUnique()
+            entity.getUnique(),
+            entity.getFolderId()
         )).collect(Collectors.toList());
 
 
@@ -83,14 +92,16 @@ public class DocumentsServiceImpl implements DocumentsService {
     public DocumentsInfo.DocumentDTO getDocument(String id) {
         DocumentsEntity entity = documentsRepository.findById(id).get();
         DocumentsInfo.DocumentDTO document = new DocumentsInfo.DocumentDTO();
-        document.setId(entity.getId());
-        document.setTitles(entity.getTitle());
-        document.setContents(entity.getContents());
-        document.setContentsType(entity.getContentsType());
-        document.setCreated(entity.getCreated());
-        document.setModified(entity.getModified());
-        document.setModifiedUser(entity.getModifiedUser());
-        document.setUnique(entity.getUnique());
+//        document.setId(entity.getId());
+//        document.setTitles(entity.getTitle());
+//        document.setContents(entity.getContents());
+//        document.setContentsType(entity.getContentsType());
+//        document.setTags(entity.getTags());
+//        document.setCreated(entity.getCreated());
+//        document.setModified(entity.getModified());
+//        document.setModifiedUser(entity.getModifiedUser());
+//        document.setUnique(entity.getUnique());
+        BeanUtils.copyProperties(entity, document);
         return document;
     }
 
@@ -98,14 +109,15 @@ public class DocumentsServiceImpl implements DocumentsService {
     public DocumentsInfo.DocumentDTO getDocumentUnique(String unique) {
         DocumentsEntity entity = documentsRepository.findByUnique(unique);
         DocumentsInfo.DocumentDTO document = new DocumentsInfo.DocumentDTO();
-        document.setId(entity.getId());
-        document.setTitles(entity.getTitle());
-        document.setContents(entity.getContents());
-        document.setContentsType(entity.getContentsType());
-        document.setCreated(entity.getCreated());
-        document.setModified(entity.getModified());
-        document.setModifiedUser(entity.getModifiedUser());
-        document.setUnique(entity.getUnique());
+//        document.setId(entity.getId());
+//        document.setTitles(entity.getTitle());
+//        document.setContents(entity.getContents());
+//        document.setContentsType(entity.getContentsType());
+//        document.setCreated(entity.getCreated());
+//        document.setModified(entity.getModified());
+//        document.setModifiedUser(entity.getModifiedUser());
+//        document.setUnique(entity.getUnique());
+        BeanUtils.copyProperties(entity, document);
         return document;
     }
 
@@ -123,12 +135,16 @@ public class DocumentsServiceImpl implements DocumentsService {
         DocumentsEntity entity = documentsRepository.findById(id).get();
 
 //        DocumentsEntity entity = new DocumentsEntity();
-        entity.setTitle(data.getTitles());
+        entity.setTitle(data.getTitle());
         entity.setContents(data.getContents());
         entity.setContentsType(data.getContentsType());
+        entity.setDisclose(data.isDisclose());
+        entity.setTags(data.getTags());
         entity.setModified(now);
         entity.setModifiedUser("haries");
         entity.setUnique(data.getUnique());
+        entity.setFolderId(data.getFolderId());
+
 
         documentsRepository.save(entity);
     }
