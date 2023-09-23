@@ -20,13 +20,18 @@ spring:
       password: qkdrhd
       database: admin
   security:
+    user:
+      name: user
+      password: 1234
+    jwt:
+      secret: VlwEyVBsYt9V7zq57TejMnVUyzblYcfPQye08f7MGVsdfefvcw4d2
     oauth2:
       client:
         registration:
           naver:
             client-id: 9DSEx8iWeID5BfviAwq8
             client-secret: QsimeonAYx
-            redirect-uri: http://localhost:2999/naver/login
+            redirect-uri: http://localhost:2999
             authorization-grant-type: authorization_code
             scope:
               - name
