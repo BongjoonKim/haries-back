@@ -11,18 +11,15 @@ import com.hariesbackend.login.service.LoginService;
 import com.hariesbackend.utils.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.json.JSONParser;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,6 +27,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -70,23 +72,59 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public UserDetails loadUserByUsername(String userId) {
-        return userRepository.findById(userId)
+    public UserDetails findByEmailOrCreate(NaverDTO naverDTO) throws RuntimeException {
+        try {
+            return userRepository.findByEmail(naverDTO.getEmail())
                 .map(this::createUserDetails)
-                .orElseThrow(() -> new UsernameNotFoundException("해당하는 유저를 찾을 수 없습니다."));
+                .orElseGet(() -> {
+                    try {
+                        Users users = makeNaverDTOToUsers(naverDTO);
+                        return this.createUserDetails(users);
+                    } catch (Exception ex) {
+                        throw new RuntimeException(ex);
+                    }
+
+                });
+        } catch (Exception e) {
+            throw e;
+        }
+
+    }
+
+    private Users makeNaverDTOToUsers(NaverDTO naverDTO) throws Exception {
+        SimpleDateFormat birthdayFormat = new SimpleDateFormat("yyyymm-dd");
+        Users users = new Users();
+
+        try {
+            users.setActive(true);
+            users.setUserId(naverDTO.getId());
+            users.setNickname(naverDTO.getNickname());
+            users.setProfileImg(naverDTO.getProfile_image());
+            users.setAgeRange(naverDTO.getAge());
+            users.setGender(naverDTO.getGender());
+            users.setEmail(naverDTO.getEmail());
+            users.setPhoneNumber(naverDTO.getMobile());
+            users.setPhoneNumberE164(naverDTO.getMobile_e164());
+            users.setUserName(naverDTO.getName());
+            users.setBirthday(birthdayFormat.parse(naverDTO.getBirthyear() + naverDTO.getBirthday()));
+
+            return users;
+        } catch (Exception e) {
+            throw e;
+        }
     }
 
     // 해당하는 User 의 데이터가 존재한다면 UserDetails 객체로 만들어서 리턴
-    private UserDetails createUserDetails(Users Users) {
-        return User.builder()
-                .username(Users.getUserId())
-                .password(passwordEncoder.encode(Users.getPassword()))
-                .roles(Users.getRoles().toArray(new String[0]))
+    private UserDetails createUserDetails(Users user) {
+        return Users.builder()
+                .userName(user.getUserId())
+                .userPassword(passwordEncoder.encode(user.getPassword()))
+                .roles(user.getRoles())
                 .build();
     }
 
 
-        @Override
+    @Override
     public String getNaverLogin() {
         return NAVER_AUTH_URI + "/oauth2.0/authorize"
                 + "?client_id=" + NAVER_CLIENT_ID
@@ -104,6 +142,17 @@ public class LoginServiceImpl implements LoginService {
             accessToken = getAccessToken(code).get("access_token").asText();
             System.out.println("userInfo" + accessToken);
             JsonNode userInfo = getUserInfo(accessToken);
+
+            NaverDTO naverDTO = new NaverDTO();
+            BeanUtils.copyProperties(userInfo.get("response"), naverDTO);
+
+            UserDetails userDetails = this.findByEmailOrCreate(naverDTO);
+
+
+
+
+
+
 
 
 
@@ -146,17 +195,17 @@ public class LoginServiceImpl implements LoginService {
 
     private JsonNode getUserInfo(String accessToken) throws Exception {
         HttpHeaders headers = new HttpHeaders();
-        headers.add("Authorization", "Bearer" + accessToken);
+        headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Content-type", "application/x-www-form-urlencoded");
 
         RestTemplate restTemplate = new RestTemplate();
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         HttpEntity<?> requests = new HttpEntity<>(body, headers);
-
+        System.out.println("리퀘스트" + requests);
         try {
             ResponseEntity<String> response = restTemplate.exchange(
                     "https://openapi.naver.com/v1/nid/me",
-                    HttpMethod.POST,
+                    HttpMethod.GET,
                     requests,
                     String.class
             );

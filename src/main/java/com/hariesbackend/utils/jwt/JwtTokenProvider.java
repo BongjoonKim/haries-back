@@ -27,7 +27,6 @@ public class JwtTokenProvider {
     private final Key key;
 
     public JwtTokenProvider(@Value("${spring.security.jwt.secret}") String secretKey) {
-        System.out.println("혹시 여기"+ secretKey);
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }

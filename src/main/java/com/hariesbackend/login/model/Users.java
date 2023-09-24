@@ -22,20 +22,27 @@ import java.util.stream.Collectors;
 public class Users implements UserDetails {
     @Id
     private String id;
-    private String address;
+    private boolean active;
     private String email;
-    private String modified;
+    private Date created;
+    private Date modified;
     private String userId;
     private String userPassword;
+    private String userName;
+    private String nickname;
+    private int age;
+    private String ageRange;
+    private String gender;
     private List<String> roles = new ArrayList<>();
-    private String address2;
-    private String email2;
+    private String address;
+    private String emailSecond;
     private String phoneNumber;
-    private String address4;
-    private String address5;
-    private String authGroup;
-    private String authority;
-    private String created;
+    private String phoneNumberE164;
+    private String profileImg;
+    private Date birthday;
+
+
+
 
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.roles.stream()
