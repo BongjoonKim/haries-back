@@ -6,12 +6,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hariesbackend.login.dto.NaverDTO;
 import com.hariesbackend.login.dto.TokenDTO;
 import com.hariesbackend.login.model.Users;
-import com.hariesbackend.login.repository.UserRepository;
+import com.hariesbackend.login.repository.UsersRepository;
 import com.hariesbackend.login.service.LoginService;
 import com.hariesbackend.utils.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -29,6 +30,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Optional;
@@ -47,7 +49,8 @@ public class LoginServiceImpl implements LoginService {
     @Value("${spring.security.oauth2.client.registration.naver.redirect-uri}")
     private String NAVER_REDIRECT_URL;
 
-    private final UserRepository userRepository;
+    @Autowired
+    UsersRepository usersRepository;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
     private final PasswordEncoder passwordEncoder;
@@ -72,31 +75,26 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public UserDetails findByEmailOrCreate(NaverDTO naverDTO) throws RuntimeException {
+    public UserDetails findByEmailOrCreate(NaverDTO naverDTO) throws Exception {
         try {
-            return userRepository.findByEmail(naverDTO.getEmail())
-                .map(this::createUserDetails)
-                .orElseGet(() -> {
-                    try {
-                        Users users = makeNaverDTOToUsers(naverDTO);
-                        return this.createUserDetails(users);
-                    } catch (Exception ex) {
-                        throw new RuntimeException(ex);
-                    }
-
-                });
+            Users users = usersRepository.findByEmail(naverDTO.getEmail());
+            if (users.getUserId() == null) {
+                users = makeNaverDTOToUsers(naverDTO);    // Users 객체 생성
+                users = this.saveUsers(users);
+            }
+            return this.createUserDetails(users);
         } catch (Exception e) {
             throw e;
         }
 
     }
 
+    // NaverDTO를 Users로 생성
     private Users makeNaverDTOToUsers(NaverDTO naverDTO) throws Exception {
         SimpleDateFormat birthdayFormat = new SimpleDateFormat("yyyymm-dd");
         Users users = new Users();
 
         try {
-            users.setActive(true);
             users.setUserId(naverDTO.getId());
             users.setNickname(naverDTO.getNickname());
             users.setProfileImg(naverDTO.getProfile_image());
@@ -112,6 +110,21 @@ public class LoginServiceImpl implements LoginService {
         } catch (Exception e) {
             throw e;
         }
+    }
+
+    //신규 사용자 DB에 저장
+    private Users saveUsers(Users users) throws Exception {
+        LocalDateTime now = LocalDateTime.now();
+        users.setActive(true);
+        users.setCreated(now);
+        users.setModified(now);
+        try {
+            usersRepository.save(users);
+            return usersRepository.findByEmail(users.getEmail());
+        } catch (Exception e) {
+            throw e;
+        }
+
     }
 
     // 해당하는 User 의 데이터가 존재한다면 UserDetails 객체로 만들어서 리턴
@@ -137,24 +150,19 @@ public class LoginServiceImpl implements LoginService {
         if (code == null) throw new Exception("Failed get authorization code");
         String accessToken = "";
         String refreshToken = "";
+        ObjectMapper objectMapper = new ObjectMapper();
         try {
             // 사용자 정보 가져오는 로직
             accessToken = getAccessToken(code).get("access_token").asText();
-            System.out.println("userInfo" + accessToken);
+//            System.out.println("userInfo" + accessToken);
             JsonNode userInfo = getUserInfo(accessToken);
 
-            NaverDTO naverDTO = new NaverDTO();
-            BeanUtils.copyProperties(userInfo.get("response"), naverDTO);
+            NaverDTO naverDTO = objectMapper.treeToValue(userInfo.get("response"), NaverDTO.class);
 
             UserDetails userDetails = this.findByEmailOrCreate(naverDTO);
-
-
-
-
-
-
-
-
+            System.out.println(userDetails);
+            TokenDTO tokenDTO = this.login(userDetails.getUsername(), userDetails.getPassword());
+            System.out.println("tokenDTO"+ tokenDTO);
 
 
             return new NaverDTO();

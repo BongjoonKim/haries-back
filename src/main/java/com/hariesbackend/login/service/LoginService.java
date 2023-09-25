@@ -11,7 +11,7 @@ public interface LoginService {
 //    UserDetails loadUserByUsername(String username);
 //    boolean findOrCreateUser(String email);
 //    Users createUser(Users users);
-    UserDetails findByEmailOrCreate(NaverDTO naverDTO) throws RuntimeException;
+    UserDetails findByEmailOrCreate(NaverDTO naverDTO) throws Exception;
     NaverDTO getNaverInfo(String code, String state, String type) throws Exception;
 }
 

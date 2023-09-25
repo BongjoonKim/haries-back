@@ -9,6 +9,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
@@ -24,8 +25,8 @@ public class Users implements UserDetails {
     private String id;
     private boolean active;
     private String email;
-    private Date created;
-    private Date modified;
+    private LocalDateTime created;
+    private LocalDateTime modified;
     private String userId;
     private String userPassword;
     private String userName;
