@@ -1,6 +1,7 @@
 package com.hariesbackend.login.service.serviceImpl;
 
 
+import ch.qos.logback.core.testUtil.RandomUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hariesbackend.login.dto.NaverDTO;
@@ -14,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.util.NullableUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -29,6 +31,7 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import java.security.SecureRandom;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -51,38 +54,70 @@ public class LoginServiceImpl implements LoginService {
 
     @Autowired
     UsersRepository usersRepository;
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
-    private final PasswordEncoder passwordEncoder;
+//    private final PasswordEncoder passwordEncoder;
 
     private final static String NAVER_AUTH_URI = "https://nid.naver.com";
     private final static String NAVER_API_URI = "https://openapi.naver.com";
+
+    private String getRamdomPassword(int size) {
+        char[] charSet = new char[] {
+                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+                '!', '@', '#', '$', '%', '^', '&' };
+
+        StringBuffer sb = new StringBuffer();
+        SecureRandom sr = new SecureRandom();
+        sr.setSeed(new Date().getTime());
+
+        int idx = 0;
+        int len = charSet.length;
+        for (int i=0; i<size; i++) {
+            // idx = (int) (len * Math.random());
+            idx = sr.nextInt(len);    // 강력한 난수를 발생시키기 위해 SecureRandom을 사용한다.
+            sb.append(charSet[idx]);
+        }
+
+        return sb.toString();
+    }
 
     @Override
     public TokenDTO login(String memberId, String password) {
         // 1. Login ID/PW 를 기반으로 Authentication 객체 생성
         // 이때 authentication 는 인증 여부를 확인하는 authenticated 값이 false
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberId, password);
+        try {
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberId, password);
 
-        // 2. 실제 검증 (사용자 비밀번호 체크)이 이루어지는 부분
-        // authenticate 매서드가 실행될 때 CustomUserDetailsService 에서 만든 loadUserByUsername 메서드가 실행
-        Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+            // 2. 실제 검증 (사용자 비밀번호 체크)이 이루어지는 부분
+            // authenticate 매서드가 실행될 때 CustomUserDetailsService 에서 만든 loadUserByUsername 메서드가 실행
+            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
-        // 3. 인증 정보를 기반으로 JWT 토큰 생성
-        TokenDTO tokenDTO = jwtTokenProvider.generateToken(authentication);
+            // 3. 인증 정보를 기반으로 JWT 토큰 생성
+            TokenDTO tokenDTO = jwtTokenProvider.generateToken(authentication);
 
-        return tokenDTO;
+            return tokenDTO;
+        } catch (Exception e) {
+            throw e;
+        }
+
     }
 
     @Override
-    public UserDetails findByEmailOrCreate(NaverDTO naverDTO) throws Exception {
+    public Users findByEmailOrCreate(NaverDTO naverDTO) throws Exception {
         try {
             Users users = usersRepository.findByEmail(naverDTO.getEmail());
-            if (users.getUserId() == null) {
+            if (users == null) {
                 users = makeNaverDTOToUsers(naverDTO);    // Users 객체 생성
+                users.setUserPassword(passwordEncoder.encode(getRamdomPassword(20)));
                 users = this.saveUsers(users);
             }
-            return this.createUserDetails(users);
+            return users;
         } catch (Exception e) {
             throw e;
         }
@@ -96,6 +131,7 @@ public class LoginServiceImpl implements LoginService {
 
         try {
             users.setUserId(naverDTO.getId());
+            users.setUserPassword(naverDTO.getPassword());
             users.setNickname(naverDTO.getNickname());
             users.setProfileImg(naverDTO.getProfile_image());
             users.setAgeRange(naverDTO.getAge());
@@ -128,13 +164,13 @@ public class LoginServiceImpl implements LoginService {
     }
 
     // 해당하는 User 의 데이터가 존재한다면 UserDetails 객체로 만들어서 리턴
-    private UserDetails createUserDetails(Users user) {
-        return Users.builder()
-                .userName(user.getUserId())
-                .userPassword(passwordEncoder.encode(user.getPassword()))
-                .roles(user.getRoles())
-                .build();
-    }
+//    private UserDetails createUserDetails(Users user) {
+//        return Users.builder()
+//                .userName(user.getUserId())
+//                .password(passwordEncoder.encode(user.getPassword()))
+//                .roles(user.getRoles())
+//                .build();
+//    }
 
 
     @Override
@@ -159,9 +195,9 @@ public class LoginServiceImpl implements LoginService {
 
             NaverDTO naverDTO = objectMapper.treeToValue(userInfo.get("response"), NaverDTO.class);
 
-            UserDetails userDetails = this.findByEmailOrCreate(naverDTO);
-            System.out.println(userDetails);
-            TokenDTO tokenDTO = this.login(userDetails.getUsername(), userDetails.getPassword());
+            Users users = this.findByEmailOrCreate(naverDTO);
+//            System.out.println(userDetails);
+            TokenDTO tokenDTO = this.login(users.getUserId(), passwordEncoder.encode(users.getUserPassword()));
             System.out.println("tokenDTO"+ tokenDTO);
 
 

@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class NaverDTO {
     private String id;
+    private String password;
     private String nickname;
     private String profile_image;
     private String age;
