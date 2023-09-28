@@ -1,52 +1,36 @@
 package com.hariesbackend.utils.jwt;
 
-import com.hariesbackend.login.service.CustomUserDetailsService;
 import com.hariesbackend.login.service.serviceImpl.CustomUserDetailsServiceImpl;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
-@EnableWebSecurity
-@RequiredArgsConstructor
+@EnableWebSecurity//스프링 시큐리티 필터가 스프링 필터체인에 등록이 됩니다.
 public class SecurityConfig {
-
-    private final JwtTokenProvider jwtTokenProvider;
-
     @Autowired
-    CustomUserDetailsServiceImpl customUserDetailsService;
-
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(customUserDetailsService);
-    }
+    CustomUserDetailsServiceImpl customUserDetailsServiceImpl;
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .httpBasic()
-                .disable()
-                .csrf().disable()
-                .cors()
-                .and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+        http.csrf().disable()
+                .cors();
+//        http.authorizeRequests()
+//                .anyRequest().permitAll();
 //                .and()
-//                .authorizeRequests()
-//                .requestMatchers("/*").permitAll()
-//                .antMatchers("/members/test").hasRole("USER")
-//                .anyRequest().authenticated()
-//                .and()
-//                .addFilterBefore(new JwtAuthenticationFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
-
+//                .formLogin()
+//                .loginPage("/home")
+                //.usernameParameter("username2") -> userDetailsService의 loadByUsername함수 파라미터값을 바꾸고싶을때
+//                .loginProcessingUrl("/login")
+//                .defaultSuccessUrl("/");
         return http.build();
     }
 

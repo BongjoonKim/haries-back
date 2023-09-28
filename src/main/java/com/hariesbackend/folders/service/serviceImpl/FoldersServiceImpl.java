@@ -93,8 +93,6 @@ public class FoldersServiceImpl implements FoldersService {
         FoldersDTO folder = new FoldersDTO();
         FoldersEntity folderE = new FoldersEntity();
         BeanUtils.copyProperties(foldersRepository.findById(id).get(), folder);
-        System.out.println("폴더 값 확인"+ foldersRepository.findById(id).get());
-        System.out.println("폴더 값 확인2"+ folder);
         return folder;
     }
 

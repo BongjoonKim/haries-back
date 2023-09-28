@@ -55,12 +55,13 @@ public class LoginServiceImpl implements LoginService {
     @Autowired
     UsersRepository usersRepository;
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
+//    @Autowired
+//    PasswordEncoder passwordEncoder;
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final JwtTokenProvider jwtTokenProvider;
 //    private final PasswordEncoder passwordEncoder;
+
 
     private final static String NAVER_AUTH_URI = "https://nid.naver.com";
     private final static String NAVER_API_URI = "https://openapi.naver.com";
@@ -88,15 +89,16 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public TokenDTO login(String memberId, String password) {
+    public TokenDTO login(String userName, String password) {
         // 1. Login ID/PW 를 기반으로 Authentication 객체 생성
         // 이때 authentication 는 인증 여부를 확인하는 authenticated 값이 false
         try {
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(memberId, password);
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userName, password);
 
             // 2. 실제 검증 (사용자 비밀번호 체크)이 이루어지는 부분
             // authenticate 매서드가 실행될 때 CustomUserDetailsService 에서 만든 loadUserByUsername 메서드가 실행
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+            System.out.println("여기 왔나");
 
             // 3. 인증 정보를 기반으로 JWT 토큰 생성
             TokenDTO tokenDTO = jwtTokenProvider.generateToken(authentication);
@@ -114,7 +116,7 @@ public class LoginServiceImpl implements LoginService {
             Users users = usersRepository.findByEmail(naverDTO.getEmail());
             if (users == null) {
                 users = makeNaverDTOToUsers(naverDTO);    // Users 객체 생성
-                users.setUserPassword(passwordEncoder.encode(getRamdomPassword(20)));
+                users.setUserPassword(getRamdomPassword(20));
                 users = this.saveUsers(users);
             }
             return users;
@@ -163,15 +165,6 @@ public class LoginServiceImpl implements LoginService {
 
     }
 
-    // 해당하는 User 의 데이터가 존재한다면 UserDetails 객체로 만들어서 리턴
-//    private UserDetails createUserDetails(Users user) {
-//        return Users.builder()
-//                .userName(user.getUserId())
-//                .password(passwordEncoder.encode(user.getPassword()))
-//                .roles(user.getRoles())
-//                .build();
-//    }
-
 
     @Override
     public String getNaverLogin() {
@@ -197,7 +190,7 @@ public class LoginServiceImpl implements LoginService {
 
             Users users = this.findByEmailOrCreate(naverDTO);
 //            System.out.println(userDetails);
-            TokenDTO tokenDTO = this.login(users.getUserId(), passwordEncoder.encode(users.getUserPassword()));
+            TokenDTO tokenDTO = this.login(users.getUsername(), users.getUserPassword());
             System.out.println("tokenDTO"+ tokenDTO);
 
 
