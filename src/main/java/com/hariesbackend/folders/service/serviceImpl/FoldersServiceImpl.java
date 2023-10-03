@@ -29,22 +29,23 @@ public class FoldersServiceImpl implements FoldersService {
         return foldersDTO;
     }
 
+
+
     // 부모 폴더 및 자식 폴더 조회
     @Override
     public List<FoldersDTO> getChildFolders(String parentId) {
 
         FoldersDTO folder = this.getFolder(parentId);
-        System.out.println("parent값 확인"+ folder);
         List<FoldersDTO> foldersDTO = new ArrayList<>();
-
         List<FoldersEntity> foldersEntityList = foldersRepository.findByParentIdAndDepth(parentId, folder.getDepth() + 1);
-        System.out.println("값 확인"+ foldersEntityList);
-        foldersEntityList.stream().forEach(el -> {
-            FoldersDTO folderDTO = new FoldersDTO();
-            BeanUtils.copyProperties(el, folderDTO);
-            foldersDTO.add(folderDTO);
-        });
-
+        if (foldersEntityList.size() > 0) {
+            foldersEntityList.stream().forEach(el -> {
+                FoldersDTO folderDTO = new FoldersDTO();
+                BeanUtils.copyProperties(el, folderDTO);
+                folderDTO.setChildren(getChildFolders(el.getId())); // 재귀 함수로 만들기
+                foldersDTO.add(folderDTO);
+            });
+        }
         return foldersDTO;
     }
 

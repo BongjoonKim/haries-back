@@ -19,6 +19,8 @@ spring:
       username: haries
       password: qkdrhd
       database: admin
+  gpt:
+    token: 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
   security:
     user:
       name: user
