@@ -9,6 +9,7 @@ server:
 #      password: ayeon
 #      authentication-database: admin
 
+
 spring:
   data:
     mongodb:
@@ -20,7 +21,8 @@ spring:
       password: qkdrhd
       database: admin
   gpt:
-    token: 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
+    uri : https://api.openai.com/v1/chat/completions
+    api-key: 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
   security:
     user:
       name: user
