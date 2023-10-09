@@ -32,9 +32,9 @@ public class ChattingController {
 
     // 메세지 생성
     @PostMapping("/message")
-    public void createMessage(@RequestBody MessagesHistory message) {
+    public void createMessage(@RequestBody MessagesHistoryDTO message) {
         try {
-            chattingService.createMessage(message.getChannelId(), message.getContent());
+            chattingService.createMessage(message.getChannelId(), message.getContent(), message.getBot());
         } catch (Exception e) {
             e.printStackTrace();
         }

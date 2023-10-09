@@ -70,10 +70,16 @@ public class ChattingServiceImpl implements ChattingService {
 
     // 메세지 하나 입력할 때
     @Override
-    public void createMessage(String channelId, String content) throws Exception {
+    public void createMessage(String channelId, String content, String bot) throws Exception {
         MessagesHistory messagesHistory = new MessagesHistory();
         LocalDateTime now = LocalDateTime.now();
-        Users user = usersRepository.findByUserName("김봉준");
+        Users user = null;
+        if (bot.equals("ChatGPT")) {
+            user = usersRepository.findByUserName("ChatGPT");
+        } else {
+            user = usersRepository.findByUserName("김봉준");
+        }
+
 
         messagesHistory.setChannelId(channelId);
         messagesHistory.setContent(content);
@@ -127,6 +133,7 @@ public class ChattingServiceImpl implements ChattingService {
     public void deleteChannel(String channelId) throws Exception {
         try {
             channelRepository.deleteById(channelId);
+            messageHistoryRepository.deleteAllByChannelId(channelId);
         } catch (Exception e) {
             throw e;
         }

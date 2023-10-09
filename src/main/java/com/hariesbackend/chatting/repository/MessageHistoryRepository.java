@@ -11,5 +11,5 @@ import java.util.List;
 @Repository
 public interface MessageHistoryRepository extends MongoRepository<MessagesHistory, String> {
     List<MessagesHistory> findByChannelId(String channelId);
-
+    void deleteAllByChannelId(String channelId);
 }

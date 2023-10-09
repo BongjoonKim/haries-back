@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ChattingService {
     public void createChannel(String name) throws Exception;
-    public void createMessage(String channelId, String content) throws Exception;
+    public void createMessage(String channelId, String content, String bot) throws Exception;
     public ChannelDTO getChannel(String channelId) throws Exception;
     public List<ChannelDTO> getChannels() throws Exception;
     public void deleteChannel(String channelId) throws Exception;
