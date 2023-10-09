@@ -57,6 +57,7 @@ public class ChattingServiceImpl implements ChattingService {
 
             channels.setAuthorities(authorities);
             channels.setName(name);
+            channels.setDetail("");
             channels.setCreated(now);
             channels.setModified(now);
 
@@ -117,6 +118,15 @@ public class ChattingServiceImpl implements ChattingService {
 
             return channelDTOList;
 
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public void deleteChannel(String channelId) throws Exception {
+        try {
+            channelRepository.deleteById(channelId);
         } catch (Exception e) {
             throw e;
         }
