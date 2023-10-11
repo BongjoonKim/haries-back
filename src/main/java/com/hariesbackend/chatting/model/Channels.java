@@ -20,7 +20,6 @@ public class Channels {
     @Id
     private String id;
     private String name;
-    private String detail;
     private LocalDateTime created;
     private LocalDateTime modified;
     private List<Authority> authorities;

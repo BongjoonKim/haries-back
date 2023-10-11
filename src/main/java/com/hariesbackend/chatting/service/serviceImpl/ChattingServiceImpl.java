@@ -57,7 +57,6 @@ public class ChattingServiceImpl implements ChattingService {
 
             channels.setAuthorities(authorities);
             channels.setName(name);
-            channels.setDetail("");
             channels.setCreated(now);
             channels.setModified(now);
 
@@ -118,6 +117,15 @@ public class ChattingServiceImpl implements ChattingService {
                 if (haveUser) {
                     ChannelDTO channelDTO = new ChannelDTO();
                     BeanUtils.copyProperties(el, channelDTO);
+
+                    // 이 채널의 마지막 대화내용 보이기
+                    List<MessagesHistory> lastestMessage = messageHistoryRepository.findByChannelId(el.getId());
+                    if (lastestMessage.size() != 0) {
+                        channelDTO.setLastestMessage(lastestMessage.get(lastestMessage.size() - 1).getContent());
+                    } else {
+                        channelDTO.setLastestMessage("");
+                    }
+
                     channelDTOList.add(channelDTO);
                 }
             });
