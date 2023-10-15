@@ -7,6 +7,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 public interface LoginService {
     String getNaverLogin();
+
+    String getRamdomPassword(int size);
     TokenDTO login(String memberId, String password);
 //    UserDetails loadUserByUsername(String username);
 //    boolean findOrCreateUser(String email);

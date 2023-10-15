@@ -11,11 +11,13 @@ import com.hariesbackend.chatting.repository.MessageHistoryRepository;
 import com.hariesbackend.chatting.service.ChattingService;
 import com.hariesbackend.login.model.Users;
 import com.hariesbackend.login.repository.UsersRepository;
+import com.hariesbackend.login.service.LoginService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -38,6 +40,9 @@ public class ChattingServiceImpl implements ChattingService {
 
     @Autowired
     UsersRepository usersRepository;
+
+    @Autowired
+    LoginService loginService;
 
     // 채널 생성
     @Override
@@ -75,6 +80,23 @@ public class ChattingServiceImpl implements ChattingService {
         Users user = null;
         if (bot.equals("ChatGPT")) {
             user = usersRepository.findByUserName("ChatGPT");
+            if (ObjectUtils.isEmpty(user)) {
+                Users User = new Users();
+                // ChatGPT 봇 생성
+                User.setActive(true);
+                User.setAge(0);
+                User.setAgeRange("0");
+                User.setBot(true);
+                User.setCreated(now);
+                User.setModified(now);
+                User.setNickname("ChatGPT");
+                User.setRoles(new ArrayList<>());
+                User.setUserId("ChatGPT");
+                User.setUserName("ChatGPT");
+                User.setUserPassword(loginService.getRamdomPassword(20));
+
+                user = usersRepository.findByUserName("ChatGPT");
+            }
         } else {
             user = usersRepository.findByUserName("김봉준");
         }

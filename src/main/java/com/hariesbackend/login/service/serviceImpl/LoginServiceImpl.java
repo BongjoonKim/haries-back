@@ -66,7 +66,8 @@ public class LoginServiceImpl implements LoginService {
     private final static String NAVER_AUTH_URI = "https://nid.naver.com";
     private final static String NAVER_API_URI = "https://openapi.naver.com";
 
-    private String getRamdomPassword(int size) {
+    @Override
+    public String getRamdomPassword(int size) {
         char[] charSet = new char[] {
                 '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
                 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
@@ -84,7 +85,6 @@ public class LoginServiceImpl implements LoginService {
             idx = sr.nextInt(len);    // 강력한 난수를 발생시키기 위해 SecureRandom을 사용한다.
             sb.append(charSet[idx]);
         }
-
         return sb.toString();
     }
 
@@ -238,7 +238,6 @@ public class LoginServiceImpl implements LoginService {
         RestTemplate restTemplate = new RestTemplate();
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         HttpEntity<?> requests = new HttpEntity<>(body, headers);
-        System.out.println("리퀘스트" + requests);
         try {
             ResponseEntity<String> response = restTemplate.exchange(
                     "https://openapi.naver.com/v1/nid/me",

@@ -41,6 +41,7 @@ public class Users implements UserDetails {
     private String phoneNumberE164;
     private String profileImg;
     private Date birthday;
+    private boolean isBot;
 
 
 
