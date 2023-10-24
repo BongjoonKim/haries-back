@@ -22,7 +22,7 @@ spring:
       database: admin
   gpt:
     uri : https://api.openai.com/v1/chat/completions
-    api-key: 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
+    api-key: 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
   security:
     user:
       name: user
