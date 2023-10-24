@@ -60,7 +60,12 @@ public class JwtTokenProvider {
         return claims.getSubject();
     }
 
-    private Claims parseClaims(String accessToken) {
+    public boolean verifyToken(String token) {
+        Claims claims = parseClaims(token);
+        claims.getExpiration().after(new Date());
+    }
+
+    public Claims parseClaims(String accessToken) {
         try {
             return Jwts.parserBuilder()
                     .setSigningKey(key)

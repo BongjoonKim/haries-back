@@ -88,44 +88,6 @@ public class LoginServiceImpl implements LoginService {
         return sb.toString();
     }
 
-    @Override
-    public TokenDTO login(String userName, String password) {
-        // 1. Login ID/PW 를 기반으로 Authentication 객체 생성
-        // 이때 authentication 는 인증 여부를 확인하는 authenticated 값이 false
-        try {
-//            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userName, password);
-
-            // 2. 실제 검증 (사용자 비밀번호 체크)이 이루어지는 부분
-            // authenticate 매서드가 실행될 때 CustomUserDetailsService 에서 만든 loadUserByUsername 메서드가 실행
-//            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
-            System.out.println("여기 왔나");
-
-            // 3. 인증 정보를 기반으로 JWT 토큰 생성
-            TokenDTO tokenDTO = jwtTokenProvider.generateToken(userName);
-
-            return tokenDTO;
-        } catch (Exception e) {
-            throw e;
-        }
-
-    }
-
-    @Override
-    public Users findByEmailOrCreate(NaverDTO naverDTO) throws Exception {
-        try {
-            Users users = usersRepository.findByEmail(naverDTO.getEmail());
-            if (users == null) {
-                users = makeNaverDTOToUsers(naverDTO);    // Users 객체 생성
-                users.setUserPassword(getRamdomPassword(20));
-                users = this.saveUsers(users);
-            }
-            return users;
-        } catch (Exception e) {
-            throw e;
-        }
-
-    }
-
     // NaverDTO를 Users로 생성
     private Users makeNaverDTOToUsers(NaverDTO naverDTO) throws Exception {
         SimpleDateFormat birthdayFormat = new SimpleDateFormat("yyyymm-dd");
@@ -200,6 +162,21 @@ public class LoginServiceImpl implements LoginService {
         }
     }
 
+    @Override
+    public Users findByEmailOrCreate(NaverDTO naverDTO) throws Exception {
+        try {
+            Users users = usersRepository.findByEmail(naverDTO.getEmail());
+            if (users == null) {
+                users = makeNaverDTOToUsers(naverDTO);    // Users 객체 생성
+                users.setUserPassword(getRamdomPassword(20));
+                users = this.saveUsers(users);
+            }
+            return users;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
     private JsonNode getAccessToken(String code) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded");
@@ -225,6 +202,26 @@ public class LoginServiceImpl implements LoginService {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode jsonNode = objectMapper.readTree(responseBody);
             return jsonNode;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public TokenDTO login(String userName, String password) {
+        // 1. Login ID/PW 를 기반으로 Authentication 객체 생성
+        // 이때 authentication 는 인증 여부를 확인하는 authenticated 값이 false
+        try {
+//            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userName, password);
+
+            // 2. 실제 검증 (사용자 비밀번호 체크)이 이루어지는 부분
+            // authenticate 매서드가 실행될 때 CustomUserDetailsService 에서 만든 loadUserByUsername 메서드가 실행
+//            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+
+            // 3. 인증 정보를 기반으로 JWT 토큰 생성
+            TokenDTO tokenDTO = jwtTokenProvider.generateToken(userName);
+
+            return tokenDTO;
         } catch (Exception e) {
             throw e;
         }
