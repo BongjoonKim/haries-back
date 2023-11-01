@@ -9,7 +9,7 @@ public interface LoginService {
     String getNaverLogin();
 
     String getRamdomPassword(int size);
-    TokenDTO login(String memberId, String password);
+    TokenDTO login(String memberId, String password, String email);
 //    UserDetails loadUserByUsername(String username);
 //    boolean findOrCreateUser(String email);
 //    Users createUser(Users users);

@@ -152,7 +152,7 @@ public class LoginServiceImpl implements LoginService {
 
             Users users = this.findByEmailOrCreate(naverDTO);
 //            System.out.println(userDetails);
-            TokenDTO tokenDTO = this.login(users.getUsername(), users.getUserPassword());
+            TokenDTO tokenDTO = this.login(users.getUsername(), users.getUserPassword(), users.getEmail());
             System.out.println("tokenDTO"+ tokenDTO);
 
 
@@ -208,7 +208,7 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public TokenDTO login(String userName, String password) {
+    public TokenDTO login(String userName, String password, String email) {
         // 1. Login ID/PW 를 기반으로 Authentication 객체 생성
         // 이때 authentication 는 인증 여부를 확인하는 authenticated 값이 false
         try {
@@ -219,7 +219,7 @@ public class LoginServiceImpl implements LoginService {
 //            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
             // 3. 인증 정보를 기반으로 JWT 토큰 생성
-            TokenDTO tokenDTO = jwtTokenProvider.generateToken(userName);
+            TokenDTO tokenDTO = jwtTokenProvider.generateToken(email);
 
             return tokenDTO;
         } catch (Exception e) {

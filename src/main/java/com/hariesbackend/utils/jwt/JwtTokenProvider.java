@@ -32,12 +32,12 @@ public class JwtTokenProvider {
     }
 
     // 유저 정보를 가지고 AccessToken, RefreshToken 을 생성하는 메서드
-    public TokenDTO generateToken(String subject) {
+    public TokenDTO generateToken(String email) {
         long now = (new Date()).getTime();
 
         Date accessTokenExpiresIn = new Date(now + 86400000);
         String accessToken = Jwts.builder()
-                .setSubject(subject)
+                .setSubject(email)
                 .setExpiration(accessTokenExpiresIn)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
@@ -62,7 +62,8 @@ public class JwtTokenProvider {
 
     public boolean verifyToken(String token) {
         Claims claims = parseClaims(token);
-        claims.getExpiration().after(new Date());
+        return claims.getExpiration().after(new Date());
+
     }
 
     public Claims parseClaims(String accessToken) {
