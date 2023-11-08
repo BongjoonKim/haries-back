@@ -42,7 +42,7 @@ public class GPTServiceImpl implements GPTService {
         headers.set("Authorization", "Bearer " + token);
 
         GPTMessageDTO messageDTO = new GPTMessageDTO("user", question);
-        GPTRequestDTO requestDTO = new GPTRequestDTO("gpt-4", 1.0, false, Collections.singletonList(messageDTO));
+        GPTRequestDTO requestDTO = new GPTRequestDTO("gpt-4-1106-preview", 1.0, false, Collections.singletonList(messageDTO));
 
         HttpEntity<GPTRequestDTO> httpEntity = new HttpEntity<>(requestDTO, headers);
         RestTemplate restTemplate = new RestTemplate();
