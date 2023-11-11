@@ -1,6 +1,7 @@
 package com.hariesbackend.chatting.controller;
 
 import com.hariesbackend.chatting.dto.ChannelDTO;
+import com.hariesbackend.chatting.dto.MessagePaginationDTO;
 import com.hariesbackend.chatting.dto.MessagesHistoryDTO;
 import com.hariesbackend.chatting.model.Channels;
 import com.hariesbackend.chatting.model.MessagesHistory;
@@ -73,7 +74,7 @@ public class ChattingController {
     }
 
     @GetMapping("/messages")
-    public List<MessagesHistoryDTO> getMessages(
+    public MessagePaginationDTO getMessages(
             @RequestParam("channelId") String channelId,
             @PageableDefault(page=-1, size=10) Pageable pageable
     ) {

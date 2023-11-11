@@ -1,6 +1,7 @@
 package com.hariesbackend.chatting.service;
 
 import com.hariesbackend.chatting.dto.ChannelDTO;
+import com.hariesbackend.chatting.dto.MessagePaginationDTO;
 import com.hariesbackend.chatting.dto.MessagesHistoryDTO;
 import com.hariesbackend.chatting.model.Channels;
 import com.hariesbackend.chatting.model.MessagesHistory;
@@ -16,5 +17,5 @@ public interface ChattingService {
     public ChannelDTO getChannel(String channelId) throws Exception;
     public List<ChannelDTO> getChannels() throws Exception;
     public void deleteChannel(String channelId) throws Exception;
-    public List<MessagesHistoryDTO> getMessages(String channelId, Pageable pageable) throws Exception;
+    public MessagePaginationDTO getMessages(String channelId, Pageable pageable) throws Exception;
 }

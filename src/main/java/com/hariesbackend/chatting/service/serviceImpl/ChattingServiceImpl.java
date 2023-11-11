@@ -2,6 +2,7 @@ package com.hariesbackend.chatting.service.serviceImpl;
 
 import com.hariesbackend.chatting.constants.AdminConstant;
 import com.hariesbackend.chatting.dto.ChannelDTO;
+import com.hariesbackend.chatting.dto.MessagePaginationDTO;
 import com.hariesbackend.chatting.dto.MessagesHistoryDTO;
 import com.hariesbackend.chatting.model.Authority;
 import com.hariesbackend.chatting.model.Channels;
@@ -174,18 +175,20 @@ public class ChattingServiceImpl implements ChattingService {
 
     // 메세지 대화 내용 가져오기
     @Override
-    public List<MessagesHistoryDTO> getMessages(String channelId, Pageable pageable) throws Exception {
+    public MessagePaginationDTO getMessages(String channelId, Pageable pageable) throws Exception {
         Page<MessagesHistory> messagesHistories;
+        int nextPageNumber = -1;
         if (pageable.getPageNumber() == -1) {   // 마지막 페이지를 구하라는 느낌
             int allMessagesCnt = messageHistoryRepository.countByChannelId(channelId);
             int lastPageNumber = Math.floorDiv(allMessagesCnt, pageable.getPageSize());
-
             messagesHistories = messageHistoryRepository.findByChannelId(
                     channelId,
                     PageRequest.of(lastPageNumber, pageable.getPageSize())
             );
+            nextPageNumber = lastPageNumber - 1;
         } else {
             messagesHistories = messageHistoryRepository.findByChannelId(channelId, pageable);
+            nextPageNumber = pageable.getPageNumber() - 1;
         }
 
 
@@ -197,6 +200,10 @@ public class ChattingServiceImpl implements ChattingService {
             messagesHistoryDTOList.add(messageDTO);
         });
 
-        return messagesHistoryDTOList;
+        MessagePaginationDTO messagePaginationDTO = new MessagePaginationDTO();
+        messagePaginationDTO.setMessagesHistory(messagesHistoryDTOList);
+        messagePaginationDTO.setNextPage(nextPageNumber);
+
+        return messagePaginationDTO;
     }
 }
