@@ -15,7 +15,7 @@ public interface ChattingService {
     public void createChannel(String name) throws Exception;
     public void createMessage(String channelId, String content, String bot) throws Exception;
     public ChannelDTO getChannel(String channelId) throws Exception;
-    public List<ChannelDTO> getChannels() throws Exception;
+    public List<ChannelDTO> getChannels(String channelName) throws Exception;
     public void deleteChannel(String channelId) throws Exception;
-    public MessagePaginationDTO getMessages(String channelId, Pageable pageable) throws Exception;
+    public MessagePaginationDTO getMessages(String channelId, int page) throws Exception;
 }

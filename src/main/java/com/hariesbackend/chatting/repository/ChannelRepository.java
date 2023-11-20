@@ -8,4 +8,5 @@ import java.util.List;
 
 @Repository
 public interface ChannelRepository extends MongoRepository<Channels, String> {
+    List<Channels> findByNameContaining(String channelName);
 }

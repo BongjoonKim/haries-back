@@ -22,6 +22,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -126,11 +127,17 @@ public class ChattingServiceImpl implements ChattingService {
     }
 
     @Override
-    public List<ChannelDTO> getChannels() throws Exception {
+    public List<ChannelDTO> getChannels(String channelName) throws Exception {
         try {
             List<ChannelDTO> channelDTOList = new ArrayList<>();
-            List<Channels> channels = channelRepository.findAll();
+            List<Channels> channels;
             Users user = usersRepository.findByUserName("김봉준");
+
+            if (StringUtils.isEmpty(channelName)) {
+                channels = channelRepository.findAll();
+            } else {
+                channels= channelRepository.findByNameContaining(channelName);
+            }
 
             channels.stream().forEach(el -> {
                 boolean haveUser = false;
@@ -145,13 +152,12 @@ public class ChattingServiceImpl implements ChattingService {
                     BeanUtils.copyProperties(el, channelDTO);
 
                     // 이 채널의 마지막 대화내용 보이기
-                    Page<MessagesHistory> lastestMessage = messageHistoryRepository.findByChannelId(el.getId(), null);
-                    if (lastestMessage.getNumber() != 0) {
-                        channelDTO.setLastestMessage(lastestMessage.getContent().get(0).getContent());
+                    List<MessagesHistory> lastestMessage = messageHistoryRepository.findByChannelIdOrderByCreatedDesc(el.getId());
+                    if (lastestMessage.size() != 0) {
+                        channelDTO.setLastestMessage(lastestMessage.get(0).getContent());
                     } else {
                         channelDTO.setLastestMessage("");
                     }
-
                     channelDTOList.add(channelDTO);
                 }
             });
@@ -175,20 +181,21 @@ public class ChattingServiceImpl implements ChattingService {
 
     // 메세지 대화 내용 가져오기
     @Override
-    public MessagePaginationDTO getMessages(String channelId, Pageable pageable) throws Exception {
+    public MessagePaginationDTO getMessages(String channelId, int page) throws Exception {
         Page<MessagesHistory> messagesHistories;
+        int pageSize = 10;
         int nextPageNumber = -1;
-        if (pageable.getPageNumber() == -1) {   // 마지막 페이지를 구하라는 느낌
+        if (page == -1) {   // 마지막 페이지를 구하라는 느낌
             int allMessagesCnt = messageHistoryRepository.countByChannelId(channelId);
-            int lastPageNumber = Math.floorDiv(allMessagesCnt, pageable.getPageSize());
+            int lastPageNumber = Math.floorDiv(allMessagesCnt-1, pageSize);
             messagesHistories = messageHistoryRepository.findByChannelId(
                     channelId,
-                    PageRequest.of(lastPageNumber, pageable.getPageSize())
+                    PageRequest.of(lastPageNumber, 10)
             );
             nextPageNumber = lastPageNumber - 1;
         } else {
-            messagesHistories = messageHistoryRepository.findByChannelId(channelId, pageable);
-            nextPageNumber = pageable.getPageNumber() - 1;
+            messagesHistories = messageHistoryRepository.findByChannelId(channelId, PageRequest.of(page, pageSize));
+            nextPageNumber = page - 1;
         }
 
 

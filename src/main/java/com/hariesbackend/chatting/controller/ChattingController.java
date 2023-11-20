@@ -9,6 +9,7 @@ import com.hariesbackend.chatting.service.ChattingService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -55,9 +56,9 @@ public class ChattingController {
     }
 
     @GetMapping("/channels")
-    public List<ChannelDTO> getChannels() {
+    public List<ChannelDTO> getChannels(@RequestParam("channelName") String channelName) {
         try {
-            return chattingService.getChannels();
+            return chattingService.getChannels(channelName);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -76,10 +77,10 @@ public class ChattingController {
     @GetMapping("/messages")
     public MessagePaginationDTO getMessages(
             @RequestParam("channelId") String channelId,
-            @PageableDefault(page=-1, size=10) Pageable pageable
+            @RequestParam("page") int page
     ) {
         try {
-            return chattingService.getMessages(channelId, pageable);
+            return chattingService.getMessages(channelId, page);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
