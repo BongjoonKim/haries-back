@@ -69,6 +69,10 @@ public class ChattingController {
     public void deleteChannel(@RequestParam("channelId") String channelId) {
         try {
             chattingService.deleteChannel(channelId);
+
+
+
+
         } catch (Exception e) {
             e.printStackTrace();
         }

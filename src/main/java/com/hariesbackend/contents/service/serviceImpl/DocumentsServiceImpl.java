@@ -12,7 +12,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.util.NullableUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -33,25 +35,27 @@ public class DocumentsServiceImpl implements DocumentsService {
 
     // 글 데이터 생성
     @Override
-    public void createDocuments(DocumentsInfo.DocumentDTO data) {
-        // 현재 시스템 시간
-        LocalDateTime now = LocalDateTime.now();
-
+    public DocumentsInfo.DocumentDTO createDocuments(DocumentsInfo.DocumentDTO data) {
         DocumentsEntity entity = new DocumentsEntity();
-        entity.setTitle(data.getTitle());
-        entity.setContents(data.getContents());
-        entity.setContentsType(data.getContentsType());
-        entity.setDisclose(data.isDisclose());
-        entity.setTags(data.getTags());
-        entity.setCreated(now);
-        entity.setModified(now);
-        entity.setInitialUser("haries");
-        entity.setModifiedUser("haries");
-        entity.setUnique(data.getUnique());
-        entity.setFolderId(data.getFolderId());
-//        BeanUtils.copyProperties(data, entity);
-
-        documentsRepository.save(entity);
+        if (data.getTitle().isEmpty()) {
+            // 현재 시스템 시간
+            LocalDateTime now = LocalDateTime.now();
+            entity.setTitle(data.getTitle());
+            entity.setContents(data.getContents());
+            entity.setContentsType(data.getContentsType());
+            entity.setDisclose(data.isDisclose());
+            entity.setTags(data.getTags());
+            entity.setCreated(now);
+            entity.setModified(now);
+            entity.setInitialUser("haries");
+            entity.setModifiedUser("haries");
+            entity.setUnique(data.getUnique());
+            entity.setFolderId(data.getFolderId());
+        }
+        DocumentsInfo.DocumentDTO documentDTO = new DocumentsInfo.DocumentDTO();
+        DocumentsEntity documentsEntity = documentsRepository.save(entity);
+        BeanUtils.copyProperties(documentsEntity, documentDTO);
+        return documentDTO;
     }
 
     // 모든 글 데이터 조회
@@ -92,15 +96,6 @@ public class DocumentsServiceImpl implements DocumentsService {
     public DocumentsInfo.DocumentDTO getDocument(String id) {
         DocumentsEntity entity = documentsRepository.findById(id).get();
         DocumentsInfo.DocumentDTO document = new DocumentsInfo.DocumentDTO();
-//        document.setId(entity.getId());
-//        document.setTitles(entity.getTitle());
-//        document.setContents(entity.getContents());
-//        document.setContentsType(entity.getContentsType());
-//        document.setTags(entity.getTags());
-//        document.setCreated(entity.getCreated());
-//        document.setModified(entity.getModified());
-//        document.setModifiedUser(entity.getModifiedUser());
-//        document.setUnique(entity.getUnique());
         BeanUtils.copyProperties(entity, document);
         return document;
     }

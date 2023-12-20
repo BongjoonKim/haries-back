@@ -22,11 +22,11 @@ public class DocumentsController {
 
     // 글 쓰기
     @PostMapping("/create")
-    public void createDocuments(
+    public DocumentsInfo.DocumentDTO createDocuments(
             @RequestBody DocumentsInfo.DocumentDTO data
     ) {
         try {
-            documentsService.createDocuments(data);
+            return documentsService.createDocuments(data);
         } catch (Exception e) {
             e.printStackTrace();
             throw e;
