@@ -1,0 +1,5 @@
+*.class
+*.yml
+*.lock
+*.bin
+./gradle/*

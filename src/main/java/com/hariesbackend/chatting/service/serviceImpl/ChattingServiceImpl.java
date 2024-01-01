@@ -187,7 +187,10 @@ public class ChattingServiceImpl implements ChattingService {
         int nextPageNumber = -1;
         if (page == -1) {   // 마지막 페이지를 구하라는 느낌
             int allMessagesCnt = messageHistoryRepository.countByChannelId(channelId);
-            int lastPageNumber = Math.floorDiv(allMessagesCnt-1, pageSize);
+            int lastPageNumber = 0;
+            if (allMessagesCnt != 0) {
+                lastPageNumber = Math.floorDiv(allMessagesCnt-1, pageSize);
+            }
             messagesHistories = messageHistoryRepository.findByChannelId(
                     channelId,
                     PageRequest.of(lastPageNumber, 10)
