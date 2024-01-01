@@ -49,7 +49,7 @@ public class JwtTokenProvider {
                 .compact();
 
         return TokenDTO.builder()
-                .grantType("Bearer")
+                .grantType("Bearer ")
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();

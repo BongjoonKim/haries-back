@@ -6,7 +6,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hariesbackend.login.dto.NaverDTO;
 import com.hariesbackend.login.dto.TokenDTO;
+import com.hariesbackend.login.model.Tokens;
 import com.hariesbackend.login.model.Users;
+import com.hariesbackend.login.repository.TokensRepository;
 import com.hariesbackend.login.repository.UsersRepository;
 import com.hariesbackend.login.service.LoginService;
 import com.hariesbackend.utils.jwt.JwtTokenProvider;
@@ -55,6 +57,9 @@ public class LoginServiceImpl implements LoginService {
     @Autowired
     UsersRepository usersRepository;
 
+    @Autowired
+    TokensRepository tokensRepository;
+
 //    @Autowired
 //    PasswordEncoder passwordEncoder;
 
@@ -66,26 +71,34 @@ public class LoginServiceImpl implements LoginService {
     private final static String NAVER_AUTH_URI = "https://nid.naver.com";
     private final static String NAVER_API_URI = "https://openapi.naver.com";
 
+    // 네이버 로그인 정보 가져오기
     @Override
-    public String getRamdomPassword(int size) {
-        char[] charSet = new char[] {
-                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
-                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
-                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
-                '!', '@', '#', '$', '%', '^', '&' };
+    public NaverDTO getNaverInfo(String code, String State, String type) throws Exception{
+        if (code == null) throw new Exception("Failed get authorization code");
+        String accessToken = "";
+        String refreshToken = "";
+        ObjectMapper objectMapper = new ObjectMapper();
+        try {
+            // accessToken 추출하기
+            accessToken = getAccessToken(code).get("access_token").asText();
 
-        StringBuffer sb = new StringBuffer();
-        SecureRandom sr = new SecureRandom();
-        sr.setSeed(new Date().getTime());
+            // 사용자 정보 가져오는 로직
+            JsonNode userInfo = getUserInfo(accessToken);
 
-        int idx = 0;
-        int len = charSet.length;
-        for (int i=0; i<size; i++) {
-            // idx = (int) (len * Math.random());
-            idx = sr.nextInt(len);    // 강력한 난수를 발생시키기 위해 SecureRandom을 사용한다.
-            sb.append(charSet[idx]);
+            // 트리 구조 JSON 값 가져오기
+            NaverDTO naverDTO = objectMapper.treeToValue(userInfo.get("response"), NaverDTO.class);
+
+            // 사용자 정보를 가져오거나, 없을 경우 사용자 생성
+            Users users = this.findByEmailOrCreate(naverDTO);
+
+            TokenDTO tokenDTO = this.login(users.getUsername(), users.getUserPassword(), users.getEmail());
+            System.out.println("tokenDTO"+ tokenDTO);
+
+            naverDTO.setTokenDTO(tokenDTO);
+            return naverDTO;
+        } catch (Exception e) {
+            throw new Exception("e", e);
         }
-        return sb.toString();
     }
 
     // NaverDTO를 Users로 생성
@@ -137,32 +150,6 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public NaverDTO getNaverInfo(String code, String State, String type) throws Exception{
-        if (code == null) throw new Exception("Failed get authorization code");
-        String accessToken = "";
-        String refreshToken = "";
-        ObjectMapper objectMapper = new ObjectMapper();
-        try {
-            // 사용자 정보 가져오는 로직
-            accessToken = getAccessToken(code).get("access_token").asText();
-//            System.out.println("userInfo" + accessToken);
-            JsonNode userInfo = getUserInfo(accessToken);
-
-            NaverDTO naverDTO = objectMapper.treeToValue(userInfo.get("response"), NaverDTO.class);
-
-            Users users = this.findByEmailOrCreate(naverDTO);
-//            System.out.println(userDetails);
-            TokenDTO tokenDTO = this.login(users.getUsername(), users.getUserPassword(), users.getEmail());
-            System.out.println("tokenDTO"+ tokenDTO);
-
-
-            return new NaverDTO();
-        } catch (Exception e) {
-            throw new Exception("e", e);
-        }
-    }
-
-    @Override
     public Users findByEmailOrCreate(NaverDTO naverDTO) throws Exception {
         try {
             Users users = usersRepository.findByEmail(naverDTO.getEmail());
@@ -177,6 +164,29 @@ public class LoginServiceImpl implements LoginService {
         }
     }
 
+    @Override
+    public String getRamdomPassword(int size) {
+        char[] charSet = new char[] {
+                '0', '1', '2', '3', '4', '5', '6', '7', '8', '9',
+                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
+                'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
+                '!', '@', '#', '$', '%', '^', '&' };
+
+        StringBuffer sb = new StringBuffer();
+        SecureRandom sr = new SecureRandom();
+        sr.setSeed(new Date().getTime());
+
+        int idx = 0;
+        int len = charSet.length;
+        for (int i=0; i<size; i++) {
+            // idx = (int) (len * Math.random());
+            idx = sr.nextInt(len);    // 강력한 난수를 발생시키기 위해 SecureRandom을 사용한다.
+            sb.append(charSet[idx]);
+        }
+        return sb.toString();
+    }
+
+    // 토큰으로 사용자 정보 가져오기
     private JsonNode getAccessToken(String code) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded");
@@ -212,14 +222,22 @@ public class LoginServiceImpl implements LoginService {
         // 1. Login ID/PW 를 기반으로 Authentication 객체 생성
         // 이때 authentication 는 인증 여부를 확인하는 authenticated 값이 false
         try {
-//            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(userName, password);
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
 
             // 2. 실제 검증 (사용자 비밀번호 체크)이 이루어지는 부분
             // authenticate 매서드가 실행될 때 CustomUserDetailsService 에서 만든 loadUserByUsername 메서드가 실행
-//            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
+            Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
             // 3. 인증 정보를 기반으로 JWT 토큰 생성
             TokenDTO tokenDTO = jwtTokenProvider.generateToken(email);
+
+            Tokens tokens = new Tokens();
+
+            BeanUtils.copyProperties(tokenDTO, tokens);
+
+
+            // 4. 토큰 정보 저장
+            tokensRepository.save(tokens);
 
             return tokenDTO;
         } catch (Exception e) {

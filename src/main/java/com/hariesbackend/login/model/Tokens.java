@@ -1,19 +1,20 @@
-package com.hariesbackend.login.dto;
+package com.hariesbackend.login.model;
 
-import com.hariesbackend.login.model.Tokens;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.Id;
 
-@Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Data
-public class TokenDTO {
+@Builder
+public class Tokens {
+    @Id
+    private String id;
     private String grantType;
     private String accessToken;
     private String refreshToken;
     private String email;
 }
-

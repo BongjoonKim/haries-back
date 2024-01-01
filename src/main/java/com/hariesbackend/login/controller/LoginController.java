@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -28,14 +29,17 @@ public class LoginController {
 //        return tokenInfo;
 //    }
 
-
     @GetMapping("/naver")
-    public String naverLogin(
+    public ResponseEntity<NaverDTO> naverLogin(
             @RequestParam("code") String code,
             @RequestParam("state") String state) throws Exception {
-        NaverDTO naverInfo = loginService.getNaverInfo(code, state, "naver");
-//        return ResponseEntity.ok("Success");
-        return "Success";
+        NaverDTO naverDTO = loginService.getNaverInfo(code, state, "naver");
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", naverDTO.getTokenDTO().getGrantType() + naverDTO.getTokenDTO().getAccessToken());
+        headers.add("Refresh-Token", naverDTO.getTokenDTO().getRefreshToken());
+         return ResponseEntity.ok()
+                 .headers(headers)
+                 .body(naverDTO);
     }
 
 }

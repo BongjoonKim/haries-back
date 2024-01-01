@@ -23,6 +23,8 @@ import java.util.stream.Collectors;
 public class Users implements UserDetails {
     @Id
     private String id;
+
+    private String registrationId;
     private boolean active;
     private String email;
     private LocalDateTime created;
@@ -30,6 +32,7 @@ public class Users implements UserDetails {
     private String userId;
     private String userPassword;
     private String userName;
+    private String provider;
     private String nickname;
     private int age;
     private String ageRange;
@@ -42,6 +45,7 @@ public class Users implements UserDetails {
     private String profileImg;
     private Date birthday;
     private boolean isBot;
+    private List<? extends GrantedAuthority> authorities;
 
 
 

@@ -22,4 +22,5 @@ public class NaverDTO {
     private String name;
     private String birthday;
     private String birthyear;
+    private TokenDTO tokenDTO;
 }
