@@ -21,14 +21,6 @@ public class LoginController {
     @Autowired
     private LoginService loginService;
 
-//    @PostMapping("/")
-//    public TokenDTO login(@RequestBody MemberLoginRequestDTO memberLoginRequestDto) {
-//        String memberId = memberLoginRequestDto.getMemberId();
-//        String password = memberLoginRequestDto.getPassword();
-//        TokenDTO tokenInfo = loginService.login(memberId, password);
-//        return tokenInfo;
-//    }
-
     @GetMapping("/naver")
     public ResponseEntity<NaverDTO> naverLogin(
             @RequestParam("code") String code,

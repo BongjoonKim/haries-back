@@ -231,13 +231,22 @@ public class LoginServiceImpl implements LoginService {
             // 3. 인증 정보를 기반으로 JWT 토큰 생성
             TokenDTO tokenDTO = jwtTokenProvider.generateToken(email);
 
-            Tokens tokens = new Tokens();
+            // 4. 이미 토큰을 가지고 있다면 업데이트 하기, 없다면 신규 생성
+            Tokens tokens = tokensRepository.findByEmail(email);
+            System.out.println("토큰" + tokens);
+            if (tokens == null) {   // 신규 생성
+                Tokens newTokens = new Tokens();
+                BeanUtils.copyProperties(tokenDTO, newTokens);
+                tokensRepository.save(newTokens);
+            } else {    // 기존 것 엎어치기
+                System.out.println("이메일");
+                tokens.setAccessToken(tokenDTO.getAccessToken());
+                tokens.setRefreshToken(tokenDTO.getRefreshToken());
+                tokens.setEmail(email);
+                // 5. 토큰 Save
+                tokensRepository.save(tokens);
+            }
 
-            BeanUtils.copyProperties(tokenDTO, tokens);
-
-
-            // 4. 토큰 정보 저장
-            tokensRepository.save(tokens);
 
             return tokenDTO;
         } catch (Exception e) {

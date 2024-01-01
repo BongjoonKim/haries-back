@@ -52,6 +52,7 @@ public class JwtTokenProvider {
                 .grantType("Bearer ")
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .email(email)
                 .build();
     }
 
