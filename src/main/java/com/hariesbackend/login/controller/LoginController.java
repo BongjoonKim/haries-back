@@ -36,7 +36,7 @@ public class LoginController {
         NaverDTO naverDTO = loginService.getNaverInfo(code, state, "naver");
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", naverDTO.getTokenDTO().getGrantType() + naverDTO.getTokenDTO().getAccessToken());
-        headers.add("Refresh-Token", naverDTO.getTokenDTO().getRefreshToken());
+        headers.add("RefreshToken", naverDTO.getTokenDTO().getRefreshToken());
          return ResponseEntity.ok()
                  .headers(headers)
                  .body(naverDTO);
