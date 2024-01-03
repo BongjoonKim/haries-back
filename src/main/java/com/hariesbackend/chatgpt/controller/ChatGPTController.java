@@ -20,6 +20,6 @@ public class ChatGPTController {
 
     @PostMapping("/open-ai")
     public String getGPTAnswer(@RequestBody HashMap<String, Object> question) {
-        return gptService.gptAnswer((String) question.get("content"));
+        return gptService.gptAnswer((String) question.get("question"));
     }
 }
