@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
@@ -18,7 +19,7 @@ public class ChatGPTController {
     private GPTService gptService;
 
     @PostMapping("/open-ai")
-    public String getGPTAnswer(@RequestBody Map<String, String> question) {
-        return gptService.gptAnswer(question.get("question"));
+    public String getGPTAnswer(@RequestBody HashMap<String, Object> question) {
+        return gptService.gptAnswer((String) question.get("question"));
     }
 }
