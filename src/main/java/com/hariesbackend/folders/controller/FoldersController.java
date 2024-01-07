@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("folders")
+@RequestMapping("admin/folders")
 @Slf4j
 public class FoldersController {
     @Autowired
@@ -39,7 +39,7 @@ public class FoldersController {
 
     // 특정 폴더 조회
     @GetMapping("/folder-id")
-    public FoldersDTO getFolders(@RequestParam("id") String id) {
+    public FoldersDTO getFolder(@RequestParam("id") String id) {
         try {
             return foldersService.getFolder(id);
         } catch (Exception e) {
@@ -64,6 +64,18 @@ public class FoldersController {
             @RequestParam("parentId") String parentId) {
         try {
             return foldersService.getChildFolders(parentId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
+    @PutMapping("")
+    public FoldersDTO editFolders(
+            @RequestBody FoldersDTO foldersDTO
+    ) {
+        try {
+            return foldersService.modifyFolders(foldersDTO);
         } catch (Exception e) {
             e.printStackTrace();
             throw e;

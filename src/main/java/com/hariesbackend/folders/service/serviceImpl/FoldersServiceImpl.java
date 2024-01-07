@@ -14,6 +14,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -104,11 +105,15 @@ public class FoldersServiceImpl implements FoldersService {
 
 
     @Override
-    public void modifyFolders(String id, FoldersDTO foldersDTO) {
-         FoldersEntity foldersEntity = foldersRepository.findById(id).get();
-
-//        if(foldersDTO.getUniqueKey() !== ) {
-//            foldersEntity.setUniqueKey(foldersDTO.getUniqueKey());
-//        }
+    public FoldersDTO modifyFolders(FoldersDTO foldersDTO) {
+         FoldersEntity foldersEntity = foldersRepository.findById(foldersDTO.getId()).get();
+         if (!Objects.isNull(foldersEntity)) {
+             foldersEntity.setLabel(foldersDTO.getLabel());
+             FoldersEntity newFolders = foldersRepository.save(foldersEntity);
+             BeanUtils.copyProperties(newFolders, foldersDTO);
+             return foldersDTO;
+         } else {
+             return null;
+         }
     }
 }
