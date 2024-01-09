@@ -67,7 +67,7 @@ public class FoldersServiceImpl implements FoldersService {
         foldersEntity.setShow(foldersDTO.isShow());
         foldersEntity.setExpand(foldersDTO.isExpand());
         foldersEntity.setCreated(now);
-        foldersEntity.setModified(null);
+        foldersEntity.setModified(now);
         foldersEntity.setCreator("haries");
         foldersEntity.setModifier("haries");
 
@@ -108,7 +108,9 @@ public class FoldersServiceImpl implements FoldersService {
     public FoldersDTO modifyFolders(FoldersDTO foldersDTO) {
          FoldersEntity foldersEntity = foldersRepository.findById(foldersDTO.getId()).get();
          if (!Objects.isNull(foldersEntity)) {
+             LocalDateTime now = LocalDateTime.now();
              foldersEntity.setLabel(foldersDTO.getLabel());
+             foldersEntity.setModified(now);
              FoldersEntity newFolders = foldersRepository.save(foldersEntity);
              BeanUtils.copyProperties(newFolders, foldersDTO);
              return foldersDTO;
