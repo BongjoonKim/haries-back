@@ -61,7 +61,7 @@ public class FoldersServiceImpl implements FoldersService {
         foldersEntity.setLabel(foldersDTO.getLabel());
 //        foldersEntity.setDepth(foldersDTO.getDepth());
 //        foldersEntity.setPath(foldersDTO.getPath());
-        foldersEntity.setParentId(foldersDTO.getParentId());
+//        foldersEntity.setParentId(foldersDTO.getParentId());
         foldersEntity.setChildrenId(foldersDTO.getChildrenId());
         foldersEntity.setType(foldersDTO.getType());
         foldersEntity.setShow(foldersDTO.isShow());
@@ -76,7 +76,8 @@ public class FoldersServiceImpl implements FoldersService {
 
         if (parentFolder != null) {
             foldersEntity.setDepth(parentFolder.getDepth() + 1);
-            foldersEntity.setPath(parentFolder.getPath() + "/" + foldersDTO.getLabel());
+            foldersEntity.setPath(parentFolder.getPath() + foldersDTO.getLabel());
+            foldersEntity.setParentId(parentFolder.getParentId());
             // 자식 추가
             foldersRepository.insert(foldersEntity);
 
