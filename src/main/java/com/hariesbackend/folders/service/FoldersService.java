@@ -17,4 +17,6 @@ public interface FoldersService {
     FoldersEntity getFolderByUniqueKey(String uniqueKey);
 
     FoldersDTO modifyFolders(FoldersDTO foldersDTO);
+
+    void deleteFolder(String id);
 }

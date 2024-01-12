@@ -76,8 +76,8 @@ public class FoldersServiceImpl implements FoldersService {
 
         if (parentFolder != null) {
             foldersEntity.setDepth(parentFolder.getDepth() + 1);
-            foldersEntity.setPath(parentFolder.getPath() + foldersDTO.getLabel());
-            foldersEntity.setParentId(parentFolder.getParentId());
+            foldersEntity.setPath(parentFolder.getPath() + "/" + parentFolder.getLabel());
+            foldersEntity.setParentId(foldersDTO.getParentId());
             // 자식 추가
             foldersRepository.insert(foldersEntity);
 
@@ -118,5 +118,10 @@ public class FoldersServiceImpl implements FoldersService {
          } else {
              return null;
          }
+    }
+
+    @Override
+    public void deleteFolder(String id) {
+        foldersRepository.deleteById(id);
     }
 }

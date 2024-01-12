@@ -82,4 +82,16 @@ public class FoldersController {
         }
     }
 
+    @DeleteMapping("")
+    public void deleteFolder(
+            @RequestParam("id") String id
+    ) {
+        try {
+            foldersService.deleteFolder(id);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw e;
+        }
+    }
+
 }
