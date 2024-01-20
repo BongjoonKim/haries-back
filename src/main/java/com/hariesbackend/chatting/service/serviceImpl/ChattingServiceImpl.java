@@ -183,7 +183,7 @@ public class ChattingServiceImpl implements ChattingService {
     @Override
     public MessagePaginationDTO getMessages(String channelId, int page) throws Exception {
         Page<MessagesHistory> messagesHistories;
-        int pageSize = 10;
+        int pageSize = 15;
         int nextPageNumber = -1;
         if (page == -1) {   // 마지막 페이지를 구하라는 느낌
             int allMessagesCnt = messageHistoryRepository.countByChannelId(channelId);
@@ -193,7 +193,7 @@ public class ChattingServiceImpl implements ChattingService {
             }
             messagesHistories = messageHistoryRepository.findByChannelId(
                     channelId,
-                    PageRequest.of(lastPageNumber, 10)
+                    PageRequest.of(lastPageNumber, 15)
             );
             nextPageNumber = lastPageNumber - 1;
         } else {
