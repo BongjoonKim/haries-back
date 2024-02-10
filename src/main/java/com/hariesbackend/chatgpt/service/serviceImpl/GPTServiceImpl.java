@@ -54,7 +54,13 @@ public class GPTServiceImpl implements GPTService {
 
         List<MessagesHistory> summaryMessage = messageHistoryRepository.findByChannelIdAndUserId(channelId, "Summary");
         if (summaryMessage.size() > 0) {
-            
+            GPTMessageDTO messageDTO = new GPTMessageDTO("user", question);
+            GPTMessageDTO messageSummary = new GPTMessageDTO("system", summaryMessage.get(0).getContent());
+            List<GPTMessageDTO> messageList = new ArrayList<>();
+
+
+//            GPTRequestDTO requestDTO = new GPTRequestDTO("gpt-4-1106-preview", 1.0, false, messageDTO));
+
         } else {
             GPTMessageDTO messageDTO = new GPTMessageDTO("user", question);
             GPTRequestDTO requestDTO = new GPTRequestDTO("gpt-4-1106-preview", 1.0, false, Collections.singletonList(messageDTO));
