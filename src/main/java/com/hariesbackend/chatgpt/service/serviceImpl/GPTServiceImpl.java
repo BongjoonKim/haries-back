@@ -74,55 +74,11 @@ public class GPTServiceImpl implements GPTService {
             GPTMessageDTO messageDTO = new GPTMessageDTO("user", question);
             requestDTO = new GPTRequestDTO("gpt-4-1106-preview", 1.0, false, Collections.singletonList(messageDTO));
         }
+
         HttpEntity<GPTRequestDTO> httpEntity = new HttpEntity<>(requestDTO, headers);
         RestTemplate restTemplate = new RestTemplate();
 
         ResponseEntity<GPTResponseDTO> response = restTemplate.postForEntity(uri, httpEntity, GPTResponseDTO.class);
-
-        //////////
-        GPTMessageDTO newMessageSummaryUser = null;
-
-        // 질문 요약 정리
-        if (summarySystemMessage.size() > 0) {
-
-            GPTMessageDTO answerDTO = new GPTMessageDTO("assistant", response.getBody().getChoices().get(0).getMessage().getContent());
-            GPTMessageDTO newMessageSummarySystem= newMessageSummarySystem = new GPTMessageDTO("assistant", summarySystemMessage.get(0).getContent()); // 과거 답 요약
-            GPTMessageDTO systemSummaryRequest = new GPTMessageDTO("user","대답을 요약해줘"); // 과거 답 요약
-            
-            List<GPTMessageDTO> summaryAnswerList = new ArrayList<>();
-            summaryAnswerList.add(answerDTO);
-            summaryAnswerList.add(newMessageSummarySystem);
-            summaryAnswerList.add(systemSummaryRequest);
-
-            GPTRequestDTO summaryAnswerDTO = new GPTRequestDTO("gpt-4-1106-preview", 1.0, false, summaryAnswerList);
-            HttpEntity<GPTRequestDTO> httpEntityOfAnswer = new HttpEntity<>(summaryAnswerDTO, headers);
-            ResponseEntity<GPTResponseDTO> responseAnswer = restTemplate.postForEntity(uri, httpEntityOfAnswer, GPTResponseDTO.class);
-
-        } else {    // sumarry가 없을 경우 첫 번째 질문이 summary가 된다
-
-        }
-
-        if (summaryUserMessage.size() > 0) {
-            // 응답 요약 정리
-            GPTMessageDTO questionDTO = new GPTMessageDTO("user", question); // 과거 답 요약
-            newMessageSummaryUser = new GPTMessageDTO("user", summaryUserMessage.get(0).getContent()); // 과거 답 요약
-            GPTMessageDTO systemSummaryquestion = new GPTMessageDTO("user","질문을 요약해줘"); // 과거 답 요약
-
-            List<GPTMessageDTO> summaryQuestionList = new ArrayList<>();
-            summaryQuestionList.add(newMessageSummaryUser);
-            summaryQuestionList.add(questionDTO);
-            summaryQuestionList.add(systemSummaryquestion);
-
-            GPTRequestDTO summaryQuestionDTO = new GPTRequestDTO("gpt-4-1106-preview", 1.0, false, summaryQuestionList);
-            HttpEntity<GPTRequestDTO> httpEntityOfQuestion = new HttpEntity<>(summaryQuestionDTO, headers);
-
-            ResponseEntity<GPTResponseDTO> responseQuestion = restTemplate.postForEntity(uri, httpEntityOfQuestion, GPTResponseDTO.class);
-        } else {    // sumarry가 없을 경우 첫 번째 질문이 summary가 된다
-
-        }
-
-
-
 
         return response.getBody().getChoices().get(0).getMessage().getContent();
     }
