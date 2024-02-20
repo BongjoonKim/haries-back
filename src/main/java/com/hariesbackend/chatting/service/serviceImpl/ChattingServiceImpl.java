@@ -1,5 +1,8 @@
 package com.hariesbackend.chatting.service.serviceImpl;
 
+import com.hariesbackend.chatgpt.dto.GPTMessageDTO;
+import com.hariesbackend.chatgpt.dto.GPTRequestDTO;
+import com.hariesbackend.chatgpt.dto.GPTResponseDTO;
 import com.hariesbackend.chatting.constants.AdminConstant;
 import com.hariesbackend.chatting.dto.ChannelDTO;
 import com.hariesbackend.chatting.dto.MessagePaginationDTO;
@@ -16,14 +19,22 @@ import com.hariesbackend.login.service.LoginService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,6 +59,12 @@ public class ChattingServiceImpl implements ChattingService {
 
     @Autowired
     LoginService loginService;
+
+    @Value("${spring.gpt.api-key}")
+    private String token;
+
+    @Value("${spring.gpt.uri}")
+    private String gptURI;
 
     // 채널 생성
     @Override
@@ -106,13 +123,64 @@ public class ChattingServiceImpl implements ChattingService {
             user = usersRepository.findByUserName("김봉준");
         }
 
-
         messagesHistory.setChannelId(channelId);
         messagesHistory.setContent(content);
         messagesHistory.setUserId(user.getUserId());
         messagesHistory.setCreated(now);
 
         messageHistoryRepository.save(messagesHistory);
+
+
+        // 추가 질문 및 저장
+        URI uri = UriComponentsBuilder.fromUriString(gptURI).build().toUri();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.set("Authorization", "Bearer " + token);
+
+        if (bot.equals("ChatGPT")) {
+            // 보낼 메세지를 담을 변수
+            List<GPTMessageDTO> messageList = new ArrayList<>();
+            GPTRequestDTO requestDTO = null;
+            GPTMessageDTO askAnswer = new GPTMessageDTO("user", "요약해줘");
+
+            // 현재 답변
+            GPTMessageDTO thisAnswer = new GPTMessageDTO("assistant", content);
+            // 과거 답변
+            List<MessagesHistory> summarySystemMessage = messageHistoryRepository.findByChannelIdAndUserId(channelId, "SummarySystem");
+
+            // 과거 답변이 존재하는 경우
+            if (summarySystemMessage.size() > 0) {
+                GPTMessageDTO pastAnswer = new GPTMessageDTO("assistant", summarySystemMessage.get(0).getContent());
+                messageList.add(thisAnswer);
+                messageList.add(pastAnswer);
+                messageList.add(askAnswer);
+                requestDTO = new GPTRequestDTO("gpt-4-1106-preview", 1.0, false, messageList);
+            } else {
+                messageList.add(thisAnswer);
+                messageList.add(askAnswer);
+                requestDTO = new GPTRequestDTO("gpt-4-1106-preview", 1.0, false, messageList);
+            }
+            HttpEntity<GPTRequestDTO> httpEntity = new HttpEntity<>(requestDTO, headers);
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<GPTResponseDTO> response = restTemplate.postForEntity(uri, httpEntity, GPTResponseDTO.class);
+
+            // DB에 저장
+            // 기존에 요약본이 있을 경우
+            if (summarySystemMessage.size() > 0) {
+                summarySystemMessage.get(0).setContent(response.getBody().getChoices().get(0).getMessage().getContent());
+                messageHistoryRepository.save(summarySystemMessage.get(0));
+            } else {    // 기존의 요약본이 없을 경우
+                MessagesHistory messageSummary = new MessagesHistory();
+                messageSummary.setChannelId(channelId);
+                messageSummary.setUserId("SummarySystem");
+                messageSummary.setContent(response.getBody().getChoices().get(0).getMessage().getContent());
+                messageSummary.setCreated(now);
+                messageHistoryRepository.save(messageSummary);
+            }
+            // 직접 질문한 경우
+        } else {
+
+        }
     }
 
     // 채넘 정보 획득
