@@ -182,7 +182,43 @@ public class ChattingServiceImpl implements ChattingService {
             List<GPTMessageDTO> messageList = new ArrayList<>();
             GPTRequestDTO requestDTO = null;
             GPTMessageDTO askAnswer = new GPTMessageDTO("user", "요약해줘");
-            
+
+            // 현재 질문
+            GPTMessageDTO thisQuestion = new GPTMessageDTO("assistant", content);
+
+            // 과거 질문
+            List<MessagesHistory> summaryUserMessage = messageHistoryRepository.findByChannelIdAndUserId(channelId, "SummaryUser");
+
+            // 과거 질문이 존재하는 경우
+            if (summaryUserMessage.size() > 0) {
+                GPTMessageDTO pastQuestion = new GPTMessageDTO("user", summaryUserMessage.get(0).getContent());
+                messageList.add(thisQuestion);
+                messageList.add(pastQuestion);
+                messageList.add(askAnswer);
+                requestDTO = new GPTRequestDTO("gpt-4-1106-preview", 1.0, false, messageList);
+            } else {
+                messageList.add(thisQuestion);
+                messageList.add(askAnswer);
+                requestDTO = new GPTRequestDTO("gpt-4-1106-preview", 1.0, false, messageList);
+            }
+
+            HttpEntity<GPTRequestDTO> httpEntity = new HttpEntity<>(requestDTO, headers);
+            RestTemplate restTemplate = new RestTemplate();
+            ResponseEntity<GPTResponseDTO> response = restTemplate.postForEntity(uri, httpEntity, GPTResponseDTO.class);
+
+            // DB에 저장
+            // 기존에 요약본이 있을 경우
+            if (summaryUserMessage.size() > 0) {
+                summaryUserMessage.get(0).setContent(response.getBody().getChoices().get(0).getMessage().getContent());
+                messageHistoryRepository.save(summaryUserMessage.get(0));
+            } else {    // 기존의 요약본이 없을 경우
+                MessagesHistory messageSummary = new MessagesHistory();
+                messageSummary.setChannelId(channelId);
+                messageSummary.setUserId("SummaryUser");
+                messageSummary.setContent(response.getBody().getChoices().get(0).getMessage().getContent());
+                messageSummary.setCreated(now);
+                messageHistoryRepository.save(messageSummary);
+            }
         }
     }
 
