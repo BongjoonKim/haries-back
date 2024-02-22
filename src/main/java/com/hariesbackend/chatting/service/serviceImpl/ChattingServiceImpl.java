@@ -177,9 +177,12 @@ public class ChattingServiceImpl implements ChattingService {
                 messageSummary.setCreated(now);
                 messageHistoryRepository.save(messageSummary);
             }
-            // 직접 질문한 경우
+        // 질문한 경우 요약
         } else {
-
+            List<GPTMessageDTO> messageList = new ArrayList<>();
+            GPTRequestDTO requestDTO = null;
+            GPTMessageDTO askAnswer = new GPTMessageDTO("user", "요약해줘");
+            
         }
     }
 
