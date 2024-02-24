@@ -36,10 +36,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service
@@ -184,7 +181,7 @@ public class ChattingServiceImpl implements ChattingService {
             GPTMessageDTO askAnswer = new GPTMessageDTO("user", "요약해줘");
 
             // 현재 질문
-            GPTMessageDTO thisQuestion = new GPTMessageDTO("assistant", content);
+            GPTMessageDTO thisQuestion = new GPTMessageDTO("user", content);
 
             // 과거 질문
             List<MessagesHistory> summaryUserMessage = messageHistoryRepository.findByChannelIdAndUserId(channelId, "SummaryUser");
@@ -293,18 +290,25 @@ public class ChattingServiceImpl implements ChattingService {
         int pageSize = 15;
         int nextPageNumber = -1;
         if (page == -1) {   // 마지막 페이지를 구하라는 느낌
-            int allMessagesCnt = messageHistoryRepository.countByChannelId(channelId);
+            int allMessagesCnt = messageHistoryRepository.countByChannelIdAndUserIdNotIn(
+                channelId,
+                new ArrayList<>(List.of("SummarySystem", "SummaryUser"))
+            );
             int lastPageNumber = 0;
             if (allMessagesCnt != 0) {
                 lastPageNumber = Math.floorDiv(allMessagesCnt-1, pageSize);
             }
-            messagesHistories = messageHistoryRepository.findByChannelId(
+            messagesHistories = messageHistoryRepository.findByChannelIdAndUserIdNotIn(
                     channelId,
+                    new ArrayList<>(List.of("SummarySystem", "SummaryUser")),
                     PageRequest.of(lastPageNumber, 15)
             );
             nextPageNumber = lastPageNumber - 1;
         } else {
-            messagesHistories = messageHistoryRepository.findByChannelId(channelId, PageRequest.of(page, pageSize));
+            messagesHistories = messageHistoryRepository.findByChannelIdAndUserIdNotIn(
+                    channelId,
+                    new ArrayList<>(List.of("SummarySystem", "SummaryUser")),
+                    PageRequest.of(page, pageSize));
             nextPageNumber = page - 1;
         }
 

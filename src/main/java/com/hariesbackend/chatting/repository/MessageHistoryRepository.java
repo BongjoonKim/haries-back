@@ -16,7 +16,11 @@ public interface MessageHistoryRepository extends MongoRepository<MessagesHistor
 
     List<MessagesHistory> findByChannelIdOrderByCreatedDesc(String channelId);
     List<MessagesHistory> findByChannelIdAndUserId(String channelId, String userId);
+
+    Page<MessagesHistory> findByChannelIdAndUserIdNotIn(String channelId, List<String> userIds, Pageable pageable);
     void deleteAllByChannelId(String channelId);
 
     int countByChannelId(String channelId);
+
+    int countByChannelIdAndUserIdNotIn(String channelId, List<String> channelIds);
 }
