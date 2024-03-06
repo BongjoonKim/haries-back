@@ -37,10 +37,11 @@ public class DocumentsController {
     @GetMapping("/get-all")
     public DocumentsInfo getAllDocuments(
             @RequestParam("page") int page,
-            @RequestParam("size") int size
+            @RequestParam("size") int size,
+            @RequestParam("folderId") String folderId
     ) {
         try {
-            return documentsService.getAllDocuments(new PaginationDTO(page, size));
+            return documentsService.getAllDocuments(new PaginationDTO(page, size, folderId));
         } catch (Exception e) {
             e.printStackTrace();
             throw e;

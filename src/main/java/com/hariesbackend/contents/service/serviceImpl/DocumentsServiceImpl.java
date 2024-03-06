@@ -62,7 +62,13 @@ public class DocumentsServiceImpl implements DocumentsService {
     @Override
     public DocumentsInfo getAllDocuments(PaginationDTO paginationDTO) {
 
-        Page<DocumentsEntity> entityPage = documentsRepository.findAll(PageRequest.of(paginationDTO.getPage() - 1 ,paginationDTO.getSize()));
+        Page<DocumentsEntity> entityPage = null;
+
+        if ("all".equals(paginationDTO.getFolderId())) {
+            entityPage = documentsRepository.findAll(PageRequest.of(paginationDTO.getPage() - 1 ,paginationDTO.getSize()));
+        } else {
+            entityPage = documentsRepository.findAllByFolderId(paginationDTO.getFolderId(), PageRequest.of(paginationDTO.getPage() - 1, paginationDTO.getSize()));
+        }
 
         List<DocumentsInfo.DocumentDTO> documentsDTOList = entityPage.getContent().stream().map(entity -> new DocumentsInfo.DocumentDTO(
             entity.getId(),
