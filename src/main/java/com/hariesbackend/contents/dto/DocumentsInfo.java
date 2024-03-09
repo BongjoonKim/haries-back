@@ -30,6 +30,7 @@ public class DocumentsInfo {
         private String modifiedUser;
         private String unique;
         private String folderId;
+        private String color;
     }
 
 

@@ -51,6 +51,7 @@ public class DocumentsServiceImpl implements DocumentsService {
             entity.setModifiedUser("haries");
             entity.setUnique(data.getUnique());
             entity.setFolderId(data.getFolderId());
+            entity.setColor(data.getColor());
         }
         DocumentsInfo.DocumentDTO documentDTO = new DocumentsInfo.DocumentDTO();
         DocumentsEntity documentsEntity = documentsRepository.save(entity);
@@ -82,7 +83,8 @@ public class DocumentsServiceImpl implements DocumentsService {
             entity.getInitialUser(),
             entity.getModifiedUser(),
             entity.getUnique(),
-            entity.getFolderId()
+            entity.getFolderId(),
+            entity.getColor()
         )).collect(Collectors.toList());
 
 
@@ -135,7 +137,6 @@ public class DocumentsServiceImpl implements DocumentsService {
         LocalDateTime now = LocalDateTime.now();
         DocumentsEntity entity = documentsRepository.findById(id).get();
 
-//        DocumentsEntity entity = new DocumentsEntity();
         entity.setTitle(data.getTitle());
         entity.setContents(data.getContents());
         entity.setContentsType(data.getContentsType());
@@ -145,6 +146,7 @@ public class DocumentsServiceImpl implements DocumentsService {
         entity.setModifiedUser("haries");
         entity.setUnique(data.getUnique());
         entity.setFolderId(data.getFolderId());
+        entity.setColor(data.getColor());
 
 
         documentsRepository.save(entity);
