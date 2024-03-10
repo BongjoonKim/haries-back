@@ -11,5 +11,6 @@ import java.util.List;
 @Repository
 public interface DocumentsRepository extends MongoRepository<DocumentsEntity, String> {
     public Page<DocumentsEntity> findAllByFolderId(String folderId, Pageable pageable);
+    public Page<DocumentsEntity> findAllByFolderIdIn(List<String> folderIds, Pageable pageable);
     public DocumentsEntity findByUnique(String unique);
 }

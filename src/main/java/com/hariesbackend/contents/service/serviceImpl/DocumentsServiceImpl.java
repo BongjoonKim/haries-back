@@ -5,6 +5,8 @@ import com.hariesbackend.contents.dto.PaginationDTO;
 import com.hariesbackend.contents.model.DocumentsEntity;
 import com.hariesbackend.contents.repository.DocumentsRepository;
 import com.hariesbackend.contents.service.DocumentsService;
+import com.hariesbackend.folders.model.FoldersEntity;
+import com.hariesbackend.folders.repository.FoldersRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.springframework.beans.BeanUtils;
@@ -32,6 +34,9 @@ public class DocumentsServiceImpl implements DocumentsService {
 
     @Autowired
     DocumentsRepository documentsRepository;
+
+    @Autowired
+    FoldersRepository foldersRepository;
 
     // 글 데이터 생성
     @Override
@@ -64,11 +69,23 @@ public class DocumentsServiceImpl implements DocumentsService {
     public DocumentsInfo getAllDocuments(PaginationDTO paginationDTO) {
 
         Page<DocumentsEntity> entityPage = null;
+        FoldersEntity selectedFolder = null;
 
         if ("all".equals(paginationDTO.getFolderId())) {
             entityPage = documentsRepository.findAll(PageRequest.of(paginationDTO.getPage() - 1 ,paginationDTO.getSize()));
         } else {
-            entityPage = documentsRepository.findAllByFolderId(paginationDTO.getFolderId(), PageRequest.of(paginationDTO.getPage() - 1, paginationDTO.getSize()));
+            // 1. 폴더 아이디를 통해 folder path를 구한다
+            selectedFolder = foldersRepository.findById(paginationDTO.getFolderId()).get();
+
+            // 2. 해당 folder path를 가지는 폴더 id 목록을 가져온다 ( 선택한 폴더의 하위 모든 폴더 가져오기 )
+            List<FoldersEntity> getAllSubFolders = foldersRepository.findAllByPathContains(selectedFolder.getPath());
+
+            // 3. 선택한 폴더와 하위 모든 폴더 ID 가져오기
+            List<String> getAllSubFolderIds = getAllSubFolders.stream().map(subFolder -> subFolder.getId()
+            ).collect(Collectors.toList());
+
+//            entityPage = documentsRepository.findAllByFolderId(paginationDTO.getFolderId(), PageRequest.of(paginationDTO.getPage() - 1, paginationDTO.getSize()));
+            entityPage = documentsRepository.findAllByFolderIdIn(getAllSubFolderIds, PageRequest.of(paginationDTO.getPage() - 1, paginationDTO.getSize()));
         }
 
         List<DocumentsInfo.DocumentDTO> documentsDTOList = entityPage.getContent().stream().map(entity -> new DocumentsInfo.DocumentDTO(
