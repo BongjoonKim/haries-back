@@ -13,5 +13,5 @@ public interface DocumentsRepository extends MongoRepository<DocumentsEntity, St
     public Page<DocumentsEntity> findAllByFolderId(String folderId, Pageable pageable);
     public Page<DocumentsEntity> findAllByFolderIdIn(List<String> folderIds, Pageable pageable);
     public DocumentsEntity findByUnique(String unique);
-    
+
 }
