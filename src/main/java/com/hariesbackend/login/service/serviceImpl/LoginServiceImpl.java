@@ -95,6 +95,8 @@ public class LoginServiceImpl implements LoginService {
             System.out.println("tokenDTO"+ tokenDTO);
 
             naverDTO.setTokenDTO(tokenDTO);
+            naverDTO.setRoles(users.getRoles());
+
             return naverDTO;
         } catch (Exception e) {
             throw new Exception("e", e);
