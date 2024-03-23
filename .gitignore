@@ -2,4 +2,4 @@
 *.yml
 *.lock
 *.bin
-./gradle/*
+.gradle/*

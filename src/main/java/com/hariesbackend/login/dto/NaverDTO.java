@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -23,4 +25,5 @@ public class NaverDTO {
     private String birthday;
     private String birthyear;
     private TokenDTO tokenDTO;
+    private List<String> roles;
 }

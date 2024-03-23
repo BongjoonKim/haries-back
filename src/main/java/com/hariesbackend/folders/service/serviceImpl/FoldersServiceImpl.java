@@ -76,7 +76,7 @@ public class FoldersServiceImpl implements FoldersService {
 
         if (parentFolder != null) {
             foldersEntity.setDepth(parentFolder.getDepth() + 1);
-            foldersEntity.setPath(parentFolder.getPath() + "/" + parentFolder.getLabel());
+            foldersEntity.setPath(parentFolder.getPath() + "/" + foldersEntity.getLabel());
             foldersEntity.setParentId(foldersDTO.getParentId());
             // 자식 추가
             foldersRepository.insert(foldersEntity);

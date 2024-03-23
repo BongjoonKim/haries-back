@@ -13,4 +13,5 @@ import org.springframework.data.domain.Sort;
 public class PaginationDTO {
     private int page;
     private int size;
+    private String folderId;
 }

@@ -13,4 +13,7 @@ public interface FoldersRepository extends MongoRepository<FoldersEntity, String
     public FoldersEntity findByUniqueKey(String uniqueKey);
 
     public List<FoldersEntity> findByParentIdAndDepth(String parentId, int depth);
+
+    public List<FoldersEntity> findAllByPathContains(String path);
+
 }
