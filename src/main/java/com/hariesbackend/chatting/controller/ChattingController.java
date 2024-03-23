@@ -22,6 +22,7 @@ import java.util.Map;
 @RequestMapping("/chatting")
 @Slf4j
 public class ChattingController {
+    // 윈도우 푸쉬 테스트
     @Autowired
     private ChattingService chattingService;
 
