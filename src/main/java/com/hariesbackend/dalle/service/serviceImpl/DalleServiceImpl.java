@@ -10,11 +10,14 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -29,7 +32,7 @@ public class DalleServiceImpl implements DalleService {
 
 
     @Override
-    public DalleResDTO DalleAnswer(String channelId, String question) {
+    public DalleResDTO DalleAnswer(String question) {
         URI uri = UriComponentsBuilder.fromUriString(dalleUri).build().toUri();
         HttpHeaders headers = new org.springframework.http.HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -42,5 +45,18 @@ public class DalleServiceImpl implements DalleService {
 
         ResponseEntity<DalleResDTO> response = restTemplate.postForEntity(uri, httpEntity, DalleResDTO.class);
         return response.getBody();
+    }
+
+    @Override
+    public List<DalleResDTO> getDalleImages() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        authentication.getDetails();
+        System.out.println("test");
+        return null;
+    }
+
+    @Override
+    public DalleResDTO getDalleIamge(String id) {
+        return null;
     }
 }

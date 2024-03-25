@@ -1,14 +1,14 @@
 package com.hariesbackend.dalle.controller;
 
+import com.hariesbackend.dalle.dto.DalleReqDTO;
+import com.hariesbackend.dalle.dto.DalleResDTO;
 import com.hariesbackend.dalle.service.DalleService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
+import java.util.List;
 
 @RestController
 @RequestMapping("/dalle")
@@ -18,7 +18,12 @@ public class DalleController {
     private DalleService dalleService;
 
     @PostMapping("/image")
-    public String getImage(@RequestBody HashMap<String, Object> request) {
+    public DalleResDTO createImage(@RequestBody String question) {
+        return dalleService.DalleAnswer(question);
+    }
 
+    @GetMapping("/images")
+    public List<DalleResDTO> getImages() {
+        return dalleService.getDalleImages();
     }
 }
