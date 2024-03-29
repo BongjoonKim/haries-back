@@ -49,9 +49,7 @@ public class DalleServiceImpl implements DalleService {
 
     @Override
     public List<DalleResDTO> getDalleImages() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        authentication.getPrincipal();
-        System.out.println("userInfo" + authentication.getPrincipal());
+
         return null;
     }
 
