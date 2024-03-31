@@ -25,7 +25,8 @@ public class DalleController {
     }
 
     @GetMapping("/images")
-    public List<DalleResDTO> getImages() {
+    public List<DalleResDTO> getImages(@AuthenticationPrincipal Object data) {
+        System.out.println("AuthenticationPrincipal = " + data);
         return dalleService.getDalleImages();
     }
 }
