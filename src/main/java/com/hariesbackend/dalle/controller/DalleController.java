@@ -1,5 +1,6 @@
 package com.hariesbackend.dalle.controller;
 
+import com.hariesbackend.dalle.dto.DalleDTO;
 import com.hariesbackend.dalle.dto.DalleReqDTO;
 import com.hariesbackend.dalle.dto.DalleResDTO;
 import com.hariesbackend.dalle.service.DalleService;
@@ -20,13 +21,18 @@ public class DalleController {
     private DalleService dalleService;
 
     @PostMapping("/image")
-    public DalleResDTO createImage(@RequestBody String question) {
-        return dalleService.DalleAnswer(question);
+    public void createImage(@RequestBody HashMap<String, Object> req) {
+        System.out.println("req = " + req);
+        dalleService.DalleAnswer((String) req.get("question"));
     }
 
     @GetMapping("/images")
-    public List<DalleResDTO> getImages(@AuthenticationPrincipal Object data) {
-        System.out.println("AuthenticationPrincipal = " + data);
+    public List<DalleDTO> getImages() {
         return dalleService.getDalleImages();
+    }
+
+    @GetMapping("/image")
+    public DalleDTO getImage(@RequestParam("id") String id) {
+        return dalleService.getDalleIamge(id);
     }
 }

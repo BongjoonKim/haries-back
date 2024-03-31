@@ -15,8 +15,15 @@ public class DalleResDTO {
     private int created;
     private List<DalleAnswer> data;
 
-    private class DalleAnswer {
+    public static class DalleAnswer {
         private String revised_prompt;
         private String url;
+
+        public String getUrl() {
+            return this.url;
+        }
+        public String getRevisedPrompt() {
+            return this.revised_prompt;
+        }
     }
 }

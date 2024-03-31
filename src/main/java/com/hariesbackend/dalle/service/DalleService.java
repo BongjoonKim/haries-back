@@ -1,13 +1,14 @@
 package com.hariesbackend.dalle.service;
 
+import com.hariesbackend.dalle.dto.DalleDTO;
 import com.hariesbackend.dalle.dto.DalleResDTO;
 
 import java.util.List;
 
 public interface DalleService {
-    DalleResDTO DalleAnswer(String question);
+    void DalleAnswer(String question);
 
-    List<DalleResDTO> getDalleImages();
+    List<DalleDTO> getDalleImages();
 
-    DalleResDTO getDalleIamge(String id);
+    DalleDTO getDalleIamge(String id);
 }

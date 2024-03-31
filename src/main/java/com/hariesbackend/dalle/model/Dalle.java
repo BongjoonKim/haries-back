@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -21,7 +22,7 @@ public class Dalle {
     private String question;
     private String userId;
     private String description;
-    private Date created;
+    private LocalDateTime created;
     private int createdNumber;
-    private Date modified;
+    private LocalDateTime modified;
 }
