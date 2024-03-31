@@ -17,13 +17,10 @@ public class DalleResDTO {
 
     public static class DalleAnswer {
         private String revised_prompt;
-        private String url;
-
-        public String getUrl() {
-            return this.url;
-        }
+        private String b64_json;
         public String getRevisedPrompt() {
             return this.revised_prompt;
         }
+        public String getB64Json() {return this.b64_json;}
     }
 }

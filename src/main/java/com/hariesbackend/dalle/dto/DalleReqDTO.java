@@ -14,4 +14,5 @@ public class DalleReqDTO {
     private String prompt;
     private int n;
     private String size;
+    private String response_format;
 }

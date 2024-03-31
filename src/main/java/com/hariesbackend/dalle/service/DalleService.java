@@ -6,7 +6,7 @@ import com.hariesbackend.dalle.dto.DalleResDTO;
 import java.util.List;
 
 public interface DalleService {
-    void DalleAnswer(String question);
+    void DalleAnswer(String question) throws Exception;
 
     List<DalleDTO> getDalleImages();
 

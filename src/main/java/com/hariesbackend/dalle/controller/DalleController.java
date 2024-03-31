@@ -23,7 +23,11 @@ public class DalleController {
     @PostMapping("/image")
     public void createImage(@RequestBody HashMap<String, Object> req) {
         System.out.println("req = " + req);
-        dalleService.DalleAnswer((String) req.get("question"));
+        try {
+            dalleService.DalleAnswer((String) req.get("question"));
+        } catch (Exception e) {
+            System.out.println("DalleController.createImage error" + e);
+        }
     }
 
     @GetMapping("/images")
