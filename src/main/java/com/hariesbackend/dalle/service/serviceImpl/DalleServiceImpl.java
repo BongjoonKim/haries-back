@@ -1,5 +1,6 @@
 package com.hariesbackend.dalle.service.serviceImpl;
 
+import com.amazonaws.services.s3.model.PutObjectResult;
 import com.hariesbackend.dalle.dto.DalleDTO;
 import com.hariesbackend.dalle.dto.DalleReqDTO;
 import com.hariesbackend.dalle.dto.DalleResDTO;
@@ -8,6 +9,7 @@ import com.hariesbackend.dalle.repository.DalleRepository;
 import com.hariesbackend.dalle.service.DalleService;
 import com.hariesbackend.utils.aws.S3utils;
 import lombok.RequiredArgsConstructor;
+import org.bson.json.JsonObject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -70,20 +72,20 @@ public class DalleServiceImpl implements DalleService {
 
             Dalle dalle = new Dalle();
             LocalDateTime now = LocalDateTime.now();
-            response.getBody().getData().get(0).getRevisedPrompt();
 
             // 주소로 파일 다운로드
             String b64Json = response.getBody().getData().get(0).getB64Json();
 
-            s3utils.uploadB64ToS3(b64Json, "question");
+            String url = s3utils.uploadB64ToS3(b64Json, question);
             // 다운로드된 파일을 s3에 업로드
-
+            System.out.println("url = " + url);
 //
             dalle.setCreated(now);
             dalle.setModified(now);
             dalle.setQuestion(question);
+            dalle.setTitle(question);
             dalle.setDescription(response.getBody().getData().get(0).getRevisedPrompt());
-//            dalle.setUrl(response.getBody().getData().get(0).getUrl());
+            dalle.setUrl(url);
             dalle.setCreatedNumber(response.getBody().getCreated());
 
             dalleRepository.save(dalle);

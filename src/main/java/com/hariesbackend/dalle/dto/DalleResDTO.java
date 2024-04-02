@@ -15,12 +15,14 @@ public class DalleResDTO {
     private int created;
     private List<DalleAnswer> data;
 
+    @Data
     public static class DalleAnswer {
-        private String revised_prompt;
         private String b64_json;
+        private String revised_prompt;
+
         public String getRevisedPrompt() {
-            return this.revised_prompt;
+            return revised_prompt;
         }
-        public String getB64Json() {return this.b64_json;}
+        public String getB64Json() {return b64_json;}
     }
 }
