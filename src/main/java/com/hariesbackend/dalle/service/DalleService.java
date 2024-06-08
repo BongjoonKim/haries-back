@@ -11,4 +11,5 @@ public interface DalleService {
     List<DalleDTO> getDalleImages();
 
     DalleDTO getDalleIamge(String id);
+    void deleteDalleImage(String id) throws Exception;
 }

@@ -63,11 +63,18 @@ public class ChattingServiceImpl implements ChattingService {
     @Value("${spring.gpt.uri}")
     private String gptURI;
 
+    @Value("${spring.gpt.version}")
+    private String gptVersion;
+
+    @Value("${spring.gpt.temperature}")
+    private double gptTemperature;
+
     // 채널 생성
     @Override
     public void createChannel(String name) throws Exception {
         try {
             Channels channels = new Channels();
+
 
             // TODO 스프링 시큐리티 적용 후 작업 필요
             Users user = usersRepository.findByUserName("김봉준");
@@ -80,7 +87,12 @@ public class ChattingServiceImpl implements ChattingService {
             LocalDateTime now = LocalDateTime.now();
 
             channels.setAuthorities(authorities);
-            channels.setName(name);
+            if (name == null) {
+                int channelCnt = channelRepository.countAllBy();
+                channels.setName("channel" + channelCnt);
+            } else {
+                channels.setName(name);
+            }
             channels.setCreated(now);
             channels.setModified(now);
 
@@ -91,9 +103,9 @@ public class ChattingServiceImpl implements ChattingService {
 
     }
 
-    // 메세지 하나 입력할 때
+    // 사용자 메세지 받고 저장
     @Override
-    public void createMessage(String channelId, String content, String bot) throws Exception {
+    public void createUserMessage(String channelId, String content, String bot) throws Exception {
         MessagesHistory messagesHistory = new MessagesHistory();
         LocalDateTime now = LocalDateTime.now();
         Users user = null;
@@ -127,6 +139,44 @@ public class ChattingServiceImpl implements ChattingService {
 
         messageHistoryRepository.save(messagesHistory);
 
+    }
+
+    // 메세지 하나 입력할 때
+    @Override
+    public void createMessage(String channelId, String content, String bot) throws Exception {
+//        MessagesHistory messagesHistory = new MessagesHistory();
+        LocalDateTime now = LocalDateTime.now();
+//        Users user = null;
+//        if (bot.equals("ChatGPT")) {
+//            user = usersRepository.findByUserName("ChatGPT");
+//            if (ObjectUtils.isEmpty(user)) {
+//                Users User = new Users();
+//                // ChatGPT 봇 생성
+//                User.setActive(true);
+//                User.setAge(0);
+//                User.setAgeRange("0");
+//                User.setBot(true);
+//                User.setCreated(now);
+//                User.setModified(now);
+//                User.setNickname("ChatGPT");
+//                User.setRoles(new ArrayList<>());
+//                User.setUserId("ChatGPT");
+//                User.setUserName("ChatGPT");
+//                User.setUserPassword(loginService.getRamdomPassword(20));
+//
+//                user = usersRepository.findByUserName("ChatGPT");
+//            }
+//        } else {
+//            user = usersRepository.findByUserName("김봉준");
+//        }
+//
+//        messagesHistory.setChannelId(channelId);
+//        messagesHistory.setContent(content);
+//        messagesHistory.setUserId(user.getUserId());
+//        messagesHistory.setCreated(now);
+//
+//        messageHistoryRepository.save(messagesHistory);
+
 
         // 추가 질문 및 저장
         URI uri = UriComponentsBuilder.fromUriString(gptURI).build().toUri();
@@ -151,11 +201,11 @@ public class ChattingServiceImpl implements ChattingService {
                 messageList.add(thisAnswer);
                 messageList.add(pastAnswer);
                 messageList.add(askAnswer);
-                requestDTO = new GPTRequestDTO("gpt-4-1106-preview", 1.0, false, messageList);
+                requestDTO = new GPTRequestDTO(gptVersion, gptTemperature, false, messageList);
             } else {
                 messageList.add(thisAnswer);
                 messageList.add(askAnswer);
-                requestDTO = new GPTRequestDTO("gpt-4-1106-preview", 1.0, false, messageList);
+                requestDTO = new GPTRequestDTO(gptVersion, gptTemperature, false, messageList);
             }
             HttpEntity<GPTRequestDTO> httpEntity = new HttpEntity<>(requestDTO, headers);
             RestTemplate restTemplate = new RestTemplate();
@@ -192,11 +242,11 @@ public class ChattingServiceImpl implements ChattingService {
                 messageList.add(thisQuestion);
                 messageList.add(pastQuestion);
                 messageList.add(askAnswer);
-                requestDTO = new GPTRequestDTO("gpt-4-1106-preview", 1.0, false, messageList);
+                requestDTO = new GPTRequestDTO(gptVersion, gptTemperature, false, messageList);
             } else {
                 messageList.add(thisQuestion);
                 messageList.add(askAnswer);
-                requestDTO = new GPTRequestDTO("gpt-4-1106-preview", 1.0, false, messageList);
+                requestDTO = new GPTRequestDTO(gptVersion, gptTemperature, false, messageList);
             }
 
             HttpEntity<GPTRequestDTO> httpEntity = new HttpEntity<>(requestDTO, headers);

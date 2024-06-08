@@ -38,6 +38,12 @@ public class GPTServiceImpl implements GPTService {
     @Value("${spring.gpt.uri}")
     private String gptURI;
 
+    @Value("${spring.gpt.version}")
+    private String gptVersion;
+
+    @Value("${spring.gpt.temperature}")
+    private double gptTemperature;
+
     @Autowired
     UsersRepository usersRepository;
 
@@ -72,11 +78,11 @@ public class GPTServiceImpl implements GPTService {
                 messageList.add(messageSummaryUser);
             }
 
-            requestDTO = new GPTRequestDTO("gpt-4-1106-preview", 1.0, false, messageList);
+            requestDTO = new GPTRequestDTO(gptVersion, gptTemperature, false, messageList);
 
         } else {
             GPTMessageDTO messageDTO = new GPTMessageDTO("user", question);
-            requestDTO = new GPTRequestDTO("gpt-4-1106-preview", 1.0, false, Collections.singletonList(messageDTO));
+            requestDTO = new GPTRequestDTO(gptVersion, gptTemperature, false, Collections.singletonList(messageDTO));
         }
 
         HttpEntity<GPTRequestDTO> httpEntity = new HttpEntity<>(requestDTO, headers);

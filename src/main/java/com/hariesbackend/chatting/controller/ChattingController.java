@@ -36,6 +36,16 @@ public class ChattingController {
         }
     }
 
+    // 사용자 메세지 생성
+    @PostMapping("/user/message")
+    public void createUserMessage(@RequestBody MessagesHistoryDTO message) {
+        try {
+            chattingService.createUserMessage(message.getChannelId(), message.getContent(), message.getBot());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     // 메세지 생성
     @PostMapping("/message")
     public void createMessage(@RequestBody MessagesHistoryDTO message) {

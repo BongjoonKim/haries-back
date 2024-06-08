@@ -39,4 +39,14 @@ public class DalleController {
     public DalleDTO getImage(@RequestParam("id") String id) {
         return dalleService.getDalleIamge(id);
     }
+
+    @DeleteMapping("/image")
+    public void deleteImage(@RequestParam("id") String id) {
+        try {
+            dalleService.deleteDalleImage(id);
+        } catch (Exception e) {
+            System.out.println("DalleController.deleteImage error" + e);
+        }
+
+    }
 }

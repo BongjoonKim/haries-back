@@ -20,6 +20,7 @@ public class FoldersController {
     public void createFolder(@RequestBody FoldersDTO foldersDTO) {
         try {
             foldersService.createFolders(foldersDTO);
+
         } catch (Exception e) {
             e.printStackTrace();
             throw e;

@@ -25,7 +25,7 @@ public class S3utils {
     @Value("${spring.aws.s3.bucket}")
     private String bucketName;
 
-    public String uploadB64ToS3(String base64Data, String fileName) {
+    public String uploadB64ToS3(String base64Data, String fileName) throws Exception {
         try {
             byte[] jsonData = Base64.getDecoder().decode(base64Data);
 
@@ -38,6 +38,16 @@ public class S3utils {
             e.printStackTrace();
         }
         return null;
+    }
+
+    public void deleteFile(String key) throws Exception {
+        try {
+           amazonS3.deleteObject(bucketName, key);
+        } catch (Exception e) {
+            System.out.println("S3utils.uploadToS3 error" + e);
+            e.printStackTrace();
+        }
+
     }
 //    private Optional<File> convert
 }

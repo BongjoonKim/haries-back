@@ -114,4 +114,24 @@ public class DalleServiceImpl implements DalleService {
         BeanUtils.copyProperties(dalle, dalleDTO);
         return dalleDTO;
     }
+
+    @Override
+    public void deleteDalleImage(String id) throws Exception {
+        try {
+            // DB에 저장되어 있는 값 확인
+            Dalle dalle = dalleRepository.findById(id).get();
+
+
+            // S3에 있는 이미지 파일 지우기
+            s3utils.deleteFile("dalle/" + dalle.getQuestion());
+
+            // DB에 있는 내용 지우기
+            dalleRepository.deleteById(id);
+
+        } catch (Exception e) {
+            System.out.println("deleteDalleImage error" + e);
+            e.printStackTrace();
+        }
+
+    }
 }
