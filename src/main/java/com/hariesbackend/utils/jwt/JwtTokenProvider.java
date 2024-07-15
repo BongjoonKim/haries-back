@@ -23,59 +23,61 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class JwtTokenProvider {
-
-    private final Key key;
-
-    public JwtTokenProvider(@Value("${spring.security.jwt.secret}") String secretKey) {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        this.key = Keys.hmacShaKeyFor(keyBytes);
-    }
-
-    // 유저 정보를 가지고 AccessToken, RefreshToken 을 생성하는 메서드
-    public TokenDTO generateToken(String email) {
-        long now = (new Date()).getTime();
-
-        Date accessTokenExpiresIn = new Date(now + 86400000);
-        String accessToken = Jwts.builder()
-                .setSubject(email)
-                .setExpiration(accessTokenExpiresIn)
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-
-        // Refresh Token 생성
-        String refreshToken = Jwts.builder()
-                .setExpiration(new Date(now + 86400000))
-                .signWith(key, SignatureAlgorithm.HS256)
-                .compact();
-
-        return TokenDTO.builder()
-                .grantType("Bearer ")
-                .accessToken(accessToken)
-                .refreshToken(refreshToken)
-                .email(email)
-                .build();
-    }
-
-    public String extractSubject(String accessToken) {
-        Claims claims = parseClaims(accessToken);
-        return claims.getSubject();
-    }
-
-    public boolean verifyToken(String token) {
-        Claims claims = parseClaims(token);
-        return claims.getExpiration().after(new Date());
-
-    }
-
-    public Claims parseClaims(String accessToken) {
-        try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(accessToken)
-                    .getBody();
-        } catch (ExpiredJwtException e) {
-            return e.getClaims();
-        }
-    }
+//
+//    @Value("${sprint.security.jwt.")
+//
+//    private final Key key;
+//
+//    public JwtTokenProvider(@Value("${spring.security.jwt.secret-key}") String secretKey) {
+//        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
+//        this.key = Keys.hmacShaKeyFor(keyBytes);
+//    }
+//
+//    // 유저 정보를 가지고 AccessToken, RefreshToken 을 생성하는 메서드
+//    public TokenDTO generateToken(String email) {
+//        long now = (new Date()).getTime();
+//
+//        Date accessTokenExpiresIn = new Date(now + 86400000);
+//        String accessToken = Jwts.builder()
+//                .setSubject(email)
+//                .setExpiration(accessTokenExpiresIn)
+//                .signWith(key, SignatureAlgorithm.HS256)
+//                .compact();
+//
+//        // Refresh Token 생성
+//        String refreshToken = Jwts.builder()
+//                .setExpiration(new Date(now + 86400000))
+//                .signWith(key, SignatureAlgorithm.HS256)
+//                .compact();
+//
+//        return TokenDTO.builder()
+//                .grantType("Bearer ")
+//                .accessToken(accessToken)
+//                .refreshToken(refreshToken)
+//                .email(email)
+//                .build();
+//    }
+//
+//    public String extractSubject(String accessToken) {
+//        Claims claims = parseClaims(accessToken);
+//        return claims.getSubject();
+//    }
+//
+//    public boolean verifyToken(String token) {
+//        Claims claims = parseClaims(token);
+//        return claims.getExpiration().after(new Date());
+//
+//    }
+//
+//    public Claims parseClaims(String accessToken) {
+//        try {
+//            return Jwts.parserBuilder()
+//                    .setSigningKey(key)
+//                    .build()
+//                    .parseClaimsJws(accessToken)
+//                    .getBody();
+//        } catch (ExpiredJwtException e) {
+//            return e.getClaims();
+//        }
+//    }
 }

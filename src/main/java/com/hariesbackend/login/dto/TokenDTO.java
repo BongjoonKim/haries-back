@@ -5,15 +5,17 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
+
+import java.util.Collection;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Data
-public class TokenDTO {
-    private String grantType;
-    private String accessToken;
+public class TokenDTO  {
     private String refreshToken;
-    private String email;
+    private String accessToken;
+    private Collection<? extends GrantedAuthority> grantType;
 }
 

@@ -23,30 +23,16 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class CustomUserDetailsServiceImpl implements UserDetailsService {
-//    @Autowired
-//    UsersRepository usersRepository;
-//    @Autowired
-//    PasswordEncoder passwordEncoder;
-
-    private final UsersRepository usersRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final UsersRepository usersRepo;
 
     @Override
-    public UserDetails loadUserByUsername(String userName) throws UsernameNotFoundException {
-        try {
-            Users users = usersRepository.findByEmail(userName);
-            return User.builder()
-                    .username(users.getUsername())
-                    .password(passwordEncoder.encode(users.getUserPassword()))
-                    .roles(users.getRoles().toString())
-                    .build();
-        } catch (UsernameNotFoundException e) {
-            throw e;
-        } catch (Exception e) {
-            throw e;
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Users users = usersRepo.findByUserId(username);
+        if (users == null) {
+            throw new UsernameNotFoundException("User not found");
         }
-
+        return User.builder()
+                .username(users.getUserId())
+                .password(users.getUserPassword()).build();
     }
 }

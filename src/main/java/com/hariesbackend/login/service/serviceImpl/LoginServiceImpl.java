@@ -12,6 +12,7 @@ import com.hariesbackend.login.repository.TokensRepository;
 import com.hariesbackend.login.repository.UsersRepository;
 import com.hariesbackend.login.service.LoginService;
 import com.hariesbackend.utils.jwt.JwtTokenProvider;
+import com.hariesbackend.utils.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -64,7 +65,9 @@ public class LoginServiceImpl implements LoginService {
 //    PasswordEncoder passwordEncoder;
 
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
-    private final JwtTokenProvider jwtTokenProvider;
+//    private final JwtTokenProvider jwtTokenProvider;
+    @Autowired
+    private JwtUtil jwtUtil;
 //    private final PasswordEncoder passwordEncoder;
 
 
@@ -231,7 +234,8 @@ public class LoginServiceImpl implements LoginService {
             Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
 
             // 3. 인증 정보를 기반으로 JWT 토큰 생성
-            TokenDTO tokenDTO = jwtTokenProvider.generateToken(email);
+            String accessToken = JwtUtil.generateAccessToken(email);
+            String refreshToken = JwtUtil.generateRefreshToken(email)
 
             // 4. 이미 토큰을 가지고 있다면 업데이트 하기, 없다면 신규 생성
             Tokens tokens = tokensRepository.findByEmail(email);

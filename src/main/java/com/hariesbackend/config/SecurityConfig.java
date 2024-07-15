@@ -41,10 +41,11 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http.csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.ALWAYS).and()
                 .authorizeHttpRequests(requests -> requests
+                    .requestMatchers("/ps/**").permitAll()
                     .requestMatchers("/api/user").hasAnyRole("SCOPE_profile", "SCOPE_email")
                     .requestMatchers("/api/oidc").hasAnyRole("SCOPE_openid")
                     .requestMatchers("/*").permitAll()	// 그 외의 모든 요청은 인증 필요
-                        .anyRequest().permitAll()
+                        .anyRequest().authenticated()
                 ).oauth2Login(oauth2 -> oauth2
                         .userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig
                                 .userService(customOAuth2UserService)
@@ -60,7 +61,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    AuthenticationManager F(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
 }
