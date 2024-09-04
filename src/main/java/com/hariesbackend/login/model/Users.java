@@ -1,9 +1,6 @@
 package com.hariesbackend.login.model;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -16,21 +13,22 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Users implements UserDetails {
+public class Users extends UserCommon {
     @Id
     private String id;
 
     private String registrationId;
     private boolean active;
     private String email;
-    private LocalDateTime created;
-    private LocalDateTime modified;
     private String userId;
     private String userPassword;
+    private String password;
+    private String src;
     private String userName;
     private String provider;
     private String nickname;
@@ -45,8 +43,6 @@ public class Users implements UserDetails {
     private String profileImg;
     private Date birthday;
     private boolean isBot;
-    private List<? extends GrantedAuthority> authorities;
-
 
 
 
@@ -56,36 +52,36 @@ public class Users implements UserDetails {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public String getUsername() {
-        return this.userId;
-    }
-
-    @Override
-    public String getPassword() {
-        return this.userPassword;
-    }
-
-
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
+//    @Override
+//    public String getUsername() {
+//        return this.userId;
+//    }
+//
+//    @Override
+//    public String getPassword() {
+//        return this.userPassword;
+//    }
+//
+//
+//
+//    @Override
+//    public boolean isAccountNonExpired() {
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean isAccountNonLocked() {
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean isCredentialsNonExpired() {
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean isEnabled() {
+//        return true;
+//    }
 
 }

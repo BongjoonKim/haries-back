@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -33,6 +34,8 @@ public class CustomUserDetailsServiceImpl implements UserDetailsService {
         }
         return User.builder()
                 .username(users.getUserId())
-                .password(users.getUserPassword()).build();
+                .password(users.getUserPassword())
+                .authorities(users.getAuthorities())
+                .build();
     }
 }

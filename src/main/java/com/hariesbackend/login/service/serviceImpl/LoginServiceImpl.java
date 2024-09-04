@@ -94,7 +94,7 @@ public class LoginServiceImpl implements LoginService {
             // 사용자 정보를 가져오거나, 없을 경우 사용자 생성
             Users users = this.findByEmailOrCreate(naverDTO);
 
-            TokenDTO tokenDTO = this.login(users.getUsername(), users.getUserPassword(), users.getEmail());
+            TokenDTO tokenDTO = this.login(users.getUserName(), users.getUserPassword(), users.getEmail());
             System.out.println("tokenDTO"+ tokenDTO);
 
             naverDTO.setTokenDTO(tokenDTO);
@@ -235,8 +235,8 @@ public class LoginServiceImpl implements LoginService {
 
             // 3. 인증 정보를 기반으로 JWT 토큰 생성
             String accessToken = JwtUtil.generateAccessToken(email);
-            String refreshToken = JwtUtil.generateRefreshToken(email)
-
+            String refreshToken = JwtUtil.generateRefreshToken(email);
+            TokenDTO tokenDTO = new TokenDTO();
             // 4. 이미 토큰을 가지고 있다면 업데이트 하기, 없다면 신규 생성
             Tokens tokens = tokensRepository.findByEmail(email);
             System.out.println("토큰" + tokens);

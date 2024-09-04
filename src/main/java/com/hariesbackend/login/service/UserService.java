@@ -22,10 +22,10 @@ public class UserService {
                     .userPassword(providerUser.getPassword())
                     .provider(providerUser.getProvider())
                     .email(providerUser.getEmail())
-                    .authorities(providerUser.getAuthorities())
+//                    .authorities(providerUser.getAuthorities())
                     .active(true)
-                    .created(now)
-                    .modified(now)
+//                    .created(now)
+//                    .modified(now)
                     .build();
 
             usersRepository.save(users);
