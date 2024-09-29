@@ -4,8 +4,10 @@ package com.hariesbackend.login.service.serviceImpl;
 import ch.qos.logback.core.testUtil.RandomUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.hariesbackend.error.CustomException;
 import com.hariesbackend.login.dto.NaverDTO;
 import com.hariesbackend.login.dto.TokenDTO;
+import com.hariesbackend.login.dto.UsersDTO;
 import com.hariesbackend.login.model.Tokens;
 import com.hariesbackend.login.model.Users;
 import com.hariesbackend.login.repository.TokensRepository;
@@ -13,6 +15,7 @@ import com.hariesbackend.login.repository.UsersRepository;
 import com.hariesbackend.login.service.LoginService;
 import com.hariesbackend.utils.jwt.JwtTokenProvider;
 import com.hariesbackend.utils.jwt.JwtUtil;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -26,12 +29,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestTemplate;
 
 import java.security.SecureRandom;
@@ -282,6 +287,76 @@ public class LoginServiceImpl implements LoginService {
             return jsonNode;
         } catch (Exception e) {
             throw e;
+        }
+    }
+
+    @Override
+    public TokenDTO refreshToken(String refreshToken) throws CustomException, Exception {
+        try {
+            TokenDTO newTokenDTO = new TokenDTO();
+            Claims claims = JwtUtil.verifyToken(refreshToken);
+            System.out.println("claims = " + claims.getSubject().isEmpty());
+            if(!claims.getSubject().isEmpty()) {
+                String userId = claims.getSubject();
+                String newAccessToken  = JwtUtil.generateAccessToken(userId);
+                newTokenDTO.setRefreshToken(refreshToken);
+                newTokenDTO.setAccessToken(newAccessToken);
+            }
+            return newTokenDTO;
+        } catch (CustomException e) {
+            String message = e.getMessage();
+            if (message.contains("Token expired")) {
+                throw e;
+            } else {
+                // 잘못된 리프레시 토큰인 경우
+                throw e;
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public UsersDTO getUserInfo() throws Exception {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() != null) {
+                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+                System.out.println("userDetails = " + userDetails);
+                String username = userDetails.getUsername();
+
+                Users users = usersRepository.findByUserId(username);
+                if (users != null) {
+                    UsersDTO usersDTO = new UsersDTO();
+                    BeanUtils.copyProperties(users, usersDTO);
+                    return usersDTO;
+                } else {
+                    return null;
+                }
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            throw e;
+        }
+    }
+
+    @Override
+    public boolean isLogined() throws Exception {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() != null) {
+            UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+            System.out.println("userDetails = " + userDetails);
+            String username = userDetails.getUsername();
+
+            Users users = usersRepository.findByUserId(username);
+            if (ObjectUtils.isEmpty(users)) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return false;
         }
     }
 }

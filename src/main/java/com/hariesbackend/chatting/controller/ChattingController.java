@@ -67,9 +67,13 @@ public class ChattingController {
     }
 
     @GetMapping("/channels")
-    public List<ChannelDTO> getChannels(@RequestParam("channelName") String channelName) {
+    public List<ChannelDTO> getChannels(
+            @RequestParam("channelName") String channelName,
+            @RequestParam("message") String message
+    ) {
         try {
-            return chattingService.getChannels(channelName);
+
+            return chattingService.getChannels(channelName, message);
         } catch (Exception e) {
             e.printStackTrace();
             return null;

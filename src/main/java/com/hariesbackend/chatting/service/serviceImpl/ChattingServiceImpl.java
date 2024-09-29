@@ -24,10 +24,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
@@ -37,6 +42,8 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -75,28 +82,34 @@ public class ChattingServiceImpl implements ChattingService {
         try {
             Channels channels = new Channels();
 
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() != null) {
+                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+                String username = userDetails.getUsername();
+                System.out.println("username = " + username);
+                Users user = usersRepository.findByUserId(username);
+                List<Authority> authorities = new ArrayList<>();
+                Authority authority = new Authority();
+                authority.setAuth(AdminConstant.ADMIN.get());
+                authority.setUserId(user.getUserId());
+                authorities.add(authority);
 
-            // TODO 스프링 시큐리티 적용 후 작업 필요
-            Users user = usersRepository.findByUserName("김봉준");
-            List<Authority> authorities = new ArrayList<>();
-            Authority authority = new Authority();
-            authority.setAuth(AdminConstant.ADMIN.get());
-            authority.setUserId(user.getUserId());
-            authorities.add(authority);
+                LocalDateTime now = LocalDateTime.now();
 
-            LocalDateTime now = LocalDateTime.now();
+                channels.setAuthorities(authorities);
+                if (name == null) {
+                    int channelCnt = channelRepository.countAllBy();
+                    channels.setName("channel" + channelCnt);
+                } else {
+                    channels.setName(name);
+                }
+                channels.setCreated(now);
+                channels.setModified(now);
 
-            channels.setAuthorities(authorities);
-            if (name == null) {
-                int channelCnt = channelRepository.countAllBy();
-                channels.setName("channel" + channelCnt);
+                channelRepository.save(channels);
             } else {
-                channels.setName(name);
+                throw new Exception("로그인 후 사용해주세요");
             }
-            channels.setCreated(now);
-            channels.setModified(now);
-
-            channelRepository.save(channels);
         } catch (Exception e){
             throw e;
         }
@@ -129,7 +142,13 @@ public class ChattingServiceImpl implements ChattingService {
                 user = usersRepository.findByUserName("ChatGPT");
             }
         } else {
-            user = usersRepository.findByUserName("김봉준");
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() != null) {
+                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+                String username = userDetails.getUsername();
+                System.out.println("username = " + username);
+                user = usersRepository.findByUserId(username);
+            }
         }
 
         messagesHistory.setChannelId(channelId);
@@ -146,36 +165,6 @@ public class ChattingServiceImpl implements ChattingService {
     public void createMessage(String channelId, String content, String bot) throws Exception {
 //        MessagesHistory messagesHistory = new MessagesHistory();
         LocalDateTime now = LocalDateTime.now();
-//        Users user = null;
-//        if (bot.equals("ChatGPT")) {
-//            user = usersRepository.findByUserName("ChatGPT");
-//            if (ObjectUtils.isEmpty(user)) {
-//                Users User = new Users();
-//                // ChatGPT 봇 생성
-//                User.setActive(true);
-//                User.setAge(0);
-//                User.setAgeRange("0");
-//                User.setBot(true);
-//                User.setCreated(now);
-//                User.setModified(now);
-//                User.setNickname("ChatGPT");
-//                User.setRoles(new ArrayList<>());
-//                User.setUserId("ChatGPT");
-//                User.setUserName("ChatGPT");
-//                User.setUserPassword(loginService.getRamdomPassword(20));
-//
-//                user = usersRepository.findByUserName("ChatGPT");
-//            }
-//        } else {
-//            user = usersRepository.findByUserName("김봉준");
-//        }
-//
-//        messagesHistory.setChannelId(channelId);
-//        messagesHistory.setContent(content);
-//        messagesHistory.setUserId(user.getUserId());
-//        messagesHistory.setCreated(now);
-//
-//        messageHistoryRepository.save(messagesHistory);
 
 
         // 추가 질문 및 저장
@@ -185,6 +174,8 @@ public class ChattingServiceImpl implements ChattingService {
         headers.set("Authorization", "Bearer " + token);
 
         if (bot.equals("ChatGPT")) {
+            // gpt 답변 저장하기
+
             // 보낼 메세지를 담을 변수
             List<GPTMessageDTO> messageList = new ArrayList<>();
             GPTRequestDTO requestDTO = null;
@@ -281,43 +272,71 @@ public class ChattingServiceImpl implements ChattingService {
     }
 
     @Override
-    public List<ChannelDTO> getChannels(String channelName) throws Exception {
+    public List<ChannelDTO> getChannels(String channelName, String message) throws Exception {
         try {
             List<ChannelDTO> channelDTOList = new ArrayList<>();
-            List<Channels> channels;
-            Users user = usersRepository.findByUserName("김봉준");
+            List<Channels> channels = new ArrayList<>();
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() != null) {
+                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+                String username = userDetails.getUsername();
+                System.out.println("username = " + username);
+                Users user = usersRepository.findByUserId(username);
+                if (StringUtils.isEmpty(channelName)) {
+                    channels = channelRepository.findAll();
+                } else {
+                    // 1. 채널 명에 해당 값을 포함하고 있는 경우
+                    channels = channelRepository.findByNameContaining(channelName);
+                }
 
-            if (StringUtils.isEmpty(channelName)) {
-                channels = channelRepository.findAll();
+                if (StringUtils.hasText(message)) {
+                    // 2. 대화방에 해당 메세지를 포함하고 있는 경우의 채널
+                    List<MessagesHistory> messagesHistories = messageHistoryRepository.findByUserId(username);
+                    List<String> channelIdOfLoginUser = messagesHistories.stream().map(MessagesHistory::getChannelId).collect(Collectors.toList());
+
+                    Criteria criteria = Criteria.where("channelId").in(channelIdOfLoginUser).and("content").regex(message, "i");
+
+                    Query query = new Query(criteria);
+
+                    List<MessagesHistory> messagesContainContent = mongoTemplate.find(query, MessagesHistory.class);
+                    List<String> channelIdsContainContent = messagesContainContent.stream().map(MessagesHistory::getChannelId).collect(Collectors.toList());
+
+                    List<Channels> channelsContainContent = channelRepository.findByIdIn(channelIdsContainContent);
+
+                    // 1, 2번을 합치기
+                    channels = Stream.concat(channels.stream(), channelsContainContent.stream())
+                            .distinct()
+                            .collect(Collectors.toList());
+
+                }
+
+                channels.stream().forEach(el -> {
+                    boolean haveUser = false;
+                    for (Authority authority : el.getAuthorities()) {
+                        if (user.getUserId().equals(authority.getUserId())) {
+                            haveUser = true;
+                            break;
+                        }
+                    }
+                    if (haveUser) {
+                        ChannelDTO channelDTO = new ChannelDTO();
+                        BeanUtils.copyProperties(el, channelDTO);
+
+                        // 이 채널의 마지막 대화내용 보이기
+                        List<MessagesHistory> lastestMessage = messageHistoryRepository.findByChannelIdOrderByCreatedDesc(el.getId());
+                        if (lastestMessage.size() != 0) {
+                            channelDTO.setLastestMessage(lastestMessage.get(0).getContent());
+                        } else {
+                            channelDTO.setLastestMessage("");
+                        }
+                        channelDTOList.add(channelDTO);
+                    }
+                });
+
+                return channelDTOList;
             } else {
-                channels= channelRepository.findByNameContaining(channelName);
+                throw new Exception("로그인 후 사용해주세요");
             }
-
-            channels.stream().forEach(el -> {
-                boolean haveUser = false;
-                for(Authority authority : el.getAuthorities()) {
-                    if(user.getUserId().equals(authority.getUserId())) {
-                        haveUser = true;
-                        break;
-                    }
-                }
-                if (haveUser) {
-                    ChannelDTO channelDTO = new ChannelDTO();
-                    BeanUtils.copyProperties(el, channelDTO);
-
-                    // 이 채널의 마지막 대화내용 보이기
-                    List<MessagesHistory> lastestMessage = messageHistoryRepository.findByChannelIdOrderByCreatedDesc(el.getId());
-                    if (lastestMessage.size() != 0) {
-                        channelDTO.setLastestMessage(lastestMessage.get(0).getContent());
-                    } else {
-                        channelDTO.setLastestMessage("");
-                    }
-                    channelDTOList.add(channelDTO);
-                }
-            });
-
-            return channelDTOList;
-
         } catch (Exception e) {
             throw e;
         }

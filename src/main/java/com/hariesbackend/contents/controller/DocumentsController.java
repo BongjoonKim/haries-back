@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("documents")
+@RequestMapping("/documents")
 @Slf4j
 public class DocumentsController {
     @Autowired
@@ -36,7 +36,7 @@ public class DocumentsController {
     }
 
     // 모든 글데이터 가져오기
-    @GetMapping("/get-all")
+    @GetMapping("/ps/get-all")
     public DocumentsInfo getAllDocuments(
             @RequestParam("page") int page,
             @RequestParam("size") int size,
@@ -53,7 +53,7 @@ public class DocumentsController {
     }
 
     // 특정 글 가져오기
-    @GetMapping("/get")
+    @GetMapping("/ps/get")
     public DocumentsInfo.DocumentDTO getDocument(@RequestParam("id") String id) {
         try {
             return documentsService.getDocument(id);

@@ -10,4 +10,6 @@ import java.util.List;
 public interface ChannelRepository extends MongoRepository<Channels, String> {
     List<Channels> findByNameContaining(String channelName);
     int countAllBy();
+
+    List<Channels> findByIdIn(List<String> ids);
 }

@@ -28,7 +28,7 @@ public class FoldersController {
     }
 
     // Root 폴더 조회
-    @GetMapping("/root")
+    @GetMapping("/ps/root")
     public FoldersDTO getRootFolder() {
         try {
             return foldersService.getRootFolder();
@@ -39,7 +39,7 @@ public class FoldersController {
     }
 
     // 특정 폴더 조회
-    @GetMapping("/folder-id")
+    @GetMapping("/ps/folder-id")
     public FoldersDTO getFolder(@RequestParam("id") String id) {
         try {
             return foldersService.getFolder(id);
@@ -60,7 +60,7 @@ public class FoldersController {
     }
 
     // 해당 폴더 하위 폴더 조회
-    @GetMapping("/children")
+    @GetMapping("/ps/children")
     public List<FoldersDTO> getChildFolders(
             @RequestParam("parentId") String parentId) {
         try {

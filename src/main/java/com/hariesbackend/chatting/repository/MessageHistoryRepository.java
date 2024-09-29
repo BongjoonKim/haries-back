@@ -23,4 +23,6 @@ public interface MessageHistoryRepository extends MongoRepository<MessagesHistor
     int countByChannelId(String channelId);
 
     int countByChannelIdAndUserIdNotIn(String channelId, List<String> channelIds);
+
+    List<MessagesHistory> findByUserId(String userId);
 }
