@@ -12,8 +12,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Map;
@@ -28,11 +30,12 @@ public class ChattingController {
 
     // 채널 생성
     @PostMapping("/channel")
-    public void createChannel(@RequestBody Map<String, String> channelName) {
+    public ChannelDTO createChannel(@RequestBody Map<String, String> channelName) {
         try {
-            chattingService.createChannel(channelName.get("channelName"));
+            return chattingService.createChannel(channelName.get("channelName"));
         } catch (Exception e) {
             e.printStackTrace();
+            throw new ResponseStatusException(HttpStatus.valueOf("error"), e.getMessage());
         }
     }
 
@@ -84,10 +87,6 @@ public class ChattingController {
     public void deleteChannel(@RequestParam("channelId") String channelId) {
         try {
             chattingService.deleteChannel(channelId);
-
-
-
-
         } catch (Exception e) {
             e.printStackTrace();
         }

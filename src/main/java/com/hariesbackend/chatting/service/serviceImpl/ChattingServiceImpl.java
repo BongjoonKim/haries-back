@@ -78,7 +78,7 @@ public class ChattingServiceImpl implements ChattingService {
 
     // 채널 생성
     @Override
-    public void createChannel(String name) throws Exception {
+    public ChannelDTO createChannel(String name) throws Exception {
         try {
             Channels channels = new Channels();
 
@@ -106,7 +106,10 @@ public class ChattingServiceImpl implements ChattingService {
                 channels.setCreated(now);
                 channels.setModified(now);
 
-                channelRepository.save(channels);
+                Channels newChannel = channelRepository.save(channels);
+                ChannelDTO channelDTO = new ChannelDTO();
+                BeanUtils.copyProperties(newChannel, channelDTO);
+                return channelDTO;
             } else {
                 throw new Exception("로그인 후 사용해주세요");
             }
@@ -333,7 +336,7 @@ public class ChattingServiceImpl implements ChattingService {
                     }
                 });
 
-                return channelDTOList;
+                return channelDTOList.stream().sorted(Comparator.comparing(ChannelDTO::getCreated).reversed()).collect(Collectors.toList());
             } else {
                 throw new Exception("로그인 후 사용해주세요");
             }
