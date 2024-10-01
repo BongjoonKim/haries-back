@@ -359,4 +359,13 @@ public class LoginServiceImpl implements LoginService {
             return false;
         }
     }
+
+    @Override
+    public void logout() throws Exception {
+        try {
+            SecurityContextHolder.clearContext();
+        } catch (Exception e) {
+            throw e;
+        }
+    }
 }

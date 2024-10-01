@@ -21,5 +21,7 @@ public interface LoginService {
     UsersDTO getUserInfo() throws Exception;
 
     boolean isLogined() throws Exception;
+
+    void logout() throws Exception;
 }
 

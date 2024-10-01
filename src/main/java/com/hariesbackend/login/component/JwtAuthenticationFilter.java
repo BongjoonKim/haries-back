@@ -37,9 +37,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private CustomUserDetailsServiceImpl customUserDetailService;
 
-    @Value("${front.url}")
-    private String frontUrl;
-
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
@@ -68,7 +65,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     tokenDTO.setAccessToken(accessToken);
 
                     HttpEntity entity = new HttpEntity(tokenDTO, headers);
-                    restTemplate.exchange("frontUrl/refresh", HttpMethod.POST, entity, String.class);
+//                    restTemplate.exchange("frontUrl/refresh", HttpMethod.POST, entity, String.class);
 
                     System.out.println("JWT Token has expired");
                 } catch (Exception e) {
