@@ -10,7 +10,7 @@ public interface FoldersService {
 
     FoldersDTO getRootFolder ();
 
-    void createFolders(FoldersDTO foldersDTO);
+    void createFolders(FoldersDTO foldersDTO) throws Exception;
 
     FoldersDTO getFolder(String id);
 

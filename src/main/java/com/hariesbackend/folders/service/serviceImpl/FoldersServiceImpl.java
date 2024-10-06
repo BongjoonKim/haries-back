@@ -4,23 +4,29 @@ import com.hariesbackend.folders.dto.FoldersDTO;
 import com.hariesbackend.folders.model.FoldersEntity;
 import com.hariesbackend.folders.repository.FoldersRepository;
 import com.hariesbackend.folders.service.FoldersService;
+import com.hariesbackend.login.model.Users;
+import com.hariesbackend.login.repository.UsersRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.NullableUtils;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Slf4j
 @Service
 public class FoldersServiceImpl implements FoldersService {
     @Autowired
     FoldersRepository foldersRepository;
+
+    @Autowired
+    UsersRepository usersRepository;
 
     // Root 폴더 조회
     @Override
@@ -53,41 +59,63 @@ public class FoldersServiceImpl implements FoldersService {
 
     // 폴더 생성
     @Override
-    public void createFolders(FoldersDTO foldersDTO) {
-        FoldersEntity foldersEntity = new FoldersEntity();
-        LocalDateTime now = LocalDateTime.now();
+    public void createFolders(FoldersDTO foldersDTO) throws Exception {
+        try {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            if (authentication != null && authentication.getPrincipal() != null) {
+                UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+                System.out.println("userDetails = " + userDetails);
+                String username = userDetails.getUsername();
 
-        foldersEntity.setUniqueKey(foldersDTO.getUniqueKey());
-        foldersEntity.setLabel(foldersDTO.getLabel());
-//        foldersEntity.setDepth(foldersDTO.getDepth());
-//        foldersEntity.setPath(foldersDTO.getPath());
-//        foldersEntity.setParentId(foldersDTO.getParentId());
-        foldersEntity.setChildrenId(foldersDTO.getChildrenId());
-        foldersEntity.setType(foldersDTO.getType());
-        foldersEntity.setShow(foldersDTO.isShow());
-        foldersEntity.setExpand(foldersDTO.isExpand());
-        foldersEntity.setCreated(now);
-        foldersEntity.setModified(now);
-        foldersEntity.setCreator("haries");
-        foldersEntity.setModifier("haries");
+                Users users = usersRepository.findByUserId(username);
 
-        // 부모 폴더가 있는지 확인
-        FoldersEntity parentFolder = foldersRepository.findById(foldersDTO.getParentId()).get();
+                if (!ObjectUtils.isEmpty(users)) {
+                    FoldersEntity foldersEntity = new FoldersEntity();
+                    LocalDateTime now = LocalDateTime.now();
 
-        if (parentFolder != null) {
-            foldersEntity.setDepth(parentFolder.getDepth() + 1);
-            foldersEntity.setPath(parentFolder.getPath() + "/" + foldersEntity.getLabel());
-            foldersEntity.setParentId(foldersDTO.getParentId());
-            // 자식 추가
-            foldersRepository.insert(foldersEntity);
+                    foldersEntity.setUniqueKey(foldersDTO.getUniqueKey());
+                    foldersEntity.setLabel(foldersDTO.getLabel());
+                    //        foldersEntity.setDepth(foldersDTO.getDepth());
+                    //        foldersEntity.setPath(foldersDTO.getPath());
+                    //        foldersEntity.setParentId(foldersDTO.getParentId());
+                    foldersEntity.setChildrenId(foldersDTO.getChildrenId());
+                    foldersEntity.setType(foldersDTO.getType());
+                    foldersEntity.setShow(foldersDTO.isShow());
+                    foldersEntity.setExpand(foldersDTO.isExpand());
+                    foldersEntity.setCreated(now);
+                    foldersEntity.setModified(now);
+                    foldersEntity.setCreator(username);
+                    foldersEntity.setModifier(username);
 
-            // 부모 노드에 자식 노드 id 추가
-            FoldersEntity childFolder = foldersRepository.findByUniqueKey(foldersDTO.getUniqueKey());
-            List<String> childIdList = parentFolder.getChildrenId();
-            childIdList.add(childFolder.getId());
-            parentFolder.setChildrenId(childIdList);
+                    // 부모 폴더가 있는지 확인
+                    FoldersEntity parentFolder = foldersRepository.findById(foldersDTO.getParentId()).get();
 
-            foldersRepository.save(parentFolder);
+                    if (parentFolder != null) {
+                        foldersEntity.setDepth(parentFolder.getDepth() + 1);
+                        foldersEntity.setPath(parentFolder.getPath() + "/" + foldersEntity.getLabel());
+                        foldersEntity.setParentId(foldersDTO.getParentId());
+                        // 자식 추가
+                        foldersRepository.save(foldersEntity);
+
+                        // 부모 노드에 자식 노드 id 추가
+                        FoldersEntity childFolder = foldersRepository.findByUniqueKey(foldersDTO.getUniqueKey());
+                        List<String> childIdList = parentFolder.getChildrenId();
+                        if (!ObjectUtils.isEmpty(childIdList)) {
+                            childIdList.add(childFolder.getId());
+                            parentFolder.setChildrenId(childIdList);
+                        } else {
+                            List<String> newChildId = Collections.singletonList(childFolder.getId());
+                            parentFolder.setChildrenId(newChildId);
+                        }
+                        foldersRepository.save(parentFolder);
+
+                    }
+                } else {
+                    throw new Exception("로그인이 필요합니다");
+                }
+            }
+        } catch (Exception e) {
+             throw e;
         }
     }
 

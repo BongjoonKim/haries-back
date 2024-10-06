@@ -5,6 +5,7 @@ import com.hariesbackend.folders.model.FoldersEntity;
 import com.hariesbackend.folders.service.FoldersService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -17,13 +18,13 @@ public class FoldersController {
     private FoldersService foldersService;
 
     @PostMapping("")
-    public void createFolder(@RequestBody FoldersDTO foldersDTO) {
+    public ResponseEntity<?> createFolder(@RequestBody FoldersDTO foldersDTO) {
         try {
             foldersService.createFolders(foldersDTO);
-
+            return ResponseEntity.ok("success");
         } catch (Exception e) {
             e.printStackTrace();
-            throw e;
+            return null;
         }
     }
 
